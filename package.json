@@ -1,0 +1,28 @@
+{
+  "name": "inga-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "render": "node render.js",
+    "dev": "npm run render && vite",
+    "build": "npm run render && vite build dist",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seachicken/inga-ui.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seachicken/inga-ui/issues"
+  },
+  "homepage": "https://github.com/seachicken/inga-ui#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.13",
+    "mustache": "^4.2.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.4",
+    "vite": "^4.0.0"
+  }
+}
