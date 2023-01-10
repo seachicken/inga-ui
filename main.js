@@ -1,7 +1,3 @@
-import FileTree from './components/FileTree.js';
-
-window.customElements.define('file-tree', FileTree);
-
 const report = JSON.stringify(window['__inga__'].report);
 
 document.querySelector('#app').innerHTML = `

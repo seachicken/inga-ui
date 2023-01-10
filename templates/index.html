@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inga Report</title>
+    <link href="./main.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import FileTree from './components/FileTree.js';
+          
+      window.customElements.define('file-tree', FileTree);
+      window['__inga__'] = {{{.}}};
+    </script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
