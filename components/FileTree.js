@@ -1,9 +1,15 @@
+import { create, cssomSheet } from 'twind';
+
+const sheet = cssomSheet({ target: new CSSStyleSheet() })
+const { tw } = create({ sheet });
+
 export default class FileTree extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+    this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <ul id="file-list">
+      <ul id="file-list" class="${tw`ml-2`}">
       </ul>
 
       <template id="dir-list-item">

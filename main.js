@@ -1,12 +1,14 @@
+import { tw } from 'twind';
+
 const report = JSON.stringify(window['__inga__'].report);
 
 document.querySelector('#app').innerHTML = `
-  <div class="flex">
-    <nav class="w-64 h-full">
+  <div class="${tw`flex`}">
+    <nav class="${tw`w-64 h-full`}">
       <file-tree report=${report}></file-tree>
     </nav>
     <main>
-      <span class="text-3xl font-bold underline">
+      <span class="${tw`text-3xl font-bold underline`}">
         Hello!
       </span>
     </main>
