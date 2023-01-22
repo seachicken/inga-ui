@@ -1,6 +1,11 @@
 import { tw } from 'twind';
+import FileTree from './components/FileTree.js';
+import HierarchyView from './components/HierarchyView.js';
 
 const report = JSON.stringify(window['__inga__'].report);
+
+window.customElements.define('file-tree', FileTree);
+window.customElements.define('hierarchy-view', HierarchyView);
 
 document.querySelector('#app').innerHTML = `
   <div class="${tw`flex`}">
@@ -8,9 +13,7 @@ document.querySelector('#app').innerHTML = `
       <file-tree report=${report}></file-tree>
     </nav>
     <main>
-      <span class="${tw`text-3xl font-bold underline`}">
-        Hello!
-      </span>
+      <hierarchy-view></hierarchy-view>
     </main>
   </div>
 `;
