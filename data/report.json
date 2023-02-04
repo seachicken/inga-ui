@@ -1,32 +1,30 @@
-{
-  "report": [
-    {
-      "entorypoint": {
-        "path": "src/index.js",
-        "name": "hoge",
-        "line": 1,
-        "offset": 1
-      },
-      "origin": {
-        "path": "src/item.js",
-        "name": "create",
-        "line": 1,
-        "offset": 1
-      }
+[
+  {
+    "entorypoint": {
+      "path": "src/index.js",
+      "name": "hoge",
+      "line": 1,
+      "offset": 1
     },
-    {
-      "entorypoint": {
-        "path": "src/index.js",
-        "name": "fuga",
-        "line": 2,
-        "offset": 1
-      },
-      "origin": {
-        "path": "src/item.js",
-        "name": "update",
-        "line": 2,
-        "offset": 1
-      }
+    "origin": {
+      "path": "src/item.js",
+      "name": "create",
+      "line": 1,
+      "offset": 1
     }
-  ]
-}
+  },
+  {
+    "entorypoint": {
+      "path": "src/index.js",
+      "name": "fuga",
+      "line": 2,
+      "offset": 1
+    },
+    "origin": {
+      "path": "src/item.js",
+      "name": "update",
+      "line": 2,
+      "offset": 1
+    }
+  }
+]
