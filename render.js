@@ -1,4 +1,3 @@
-import Mustache from 'mustache';
 import fs from 'fs';
 
 const jsonPath = process.argv[2] ? process.argv[2] : './data/report.json'

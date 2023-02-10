@@ -3,7 +3,7 @@ import { create, cssomSheet } from 'twind';
 const sheet = cssomSheet({ target: new CSSStyleSheet() })
 const { tw } = create({ sheet });
 
-export default class HierarchyView extends HTMLElement {
+export default class LayerView extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
