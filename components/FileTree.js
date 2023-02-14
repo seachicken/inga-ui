@@ -9,7 +9,7 @@ export default class FileTree extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <ul id="file-list" class="${tw`ml-2`}">
+      <ul id="file-list" class="${tw`truncate ml-2 mt-3`}">
       </ul>
 
       <template id="dir-item">

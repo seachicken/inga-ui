@@ -9,7 +9,7 @@ export default class LayerView extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <ul id="code-list" class="${tw`ml-2`}">
+      <ul id="code-list" class="${tw`ml-2 mt-3`}">
       </ul>
 
       <template id="code-item">
