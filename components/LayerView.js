@@ -9,9 +9,44 @@ export default class LayerView extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <span class="${tw`text-3xl font-bold underline`}">
-        Hello!
-      </span>
+      <ul id="code-list" class="${tw`ml-2`}">
+      </ul>
+
+      <template id="code-item">
+        <li>
+          <a class="link"></a>
+        </li>
+      </template>
     `;
+
+    this._codeList = this.shadowRoot.querySelector('#code-list');
+    this._codeItemTemplate = this.shadowRoot.querySelector('#code-item');
+  }
+
+  static get observedAttributes() {
+    return ['origins', 'repourl', 'headsha'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'origins') {
+      this._origins = JSON.parse(newValue);
+    }
+    if (name === 'repourl') {
+      this._repoUrl = newValue;
+    }
+    if (name === 'headsha') {
+      this._headSha = newValue;
+    }
+    this.render();
+  }
+
+  render() {
+    for (const pos of this._origins) {
+      const codeItem = document.importNode(this._codeItemTemplate.content, true);
+      const link = codeItem.querySelector('.link');
+      link.href = `${this._repoUrl}/blob/${this._headSha}/${pos.path}`;
+      link.innerHTML = pos.path;
+      this._codeList.appendChild(codeItem);
+    }
   }
 }

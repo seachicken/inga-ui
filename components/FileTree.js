@@ -12,7 +12,7 @@ export default class FileTree extends HTMLElement {
       <ul id="file-list" class="${tw`ml-2`}">
       </ul>
 
-      <template id="dir-list-item">
+      <template id="dir-item">
         <li>
           <button class="dir-button"></button>
         </li>
@@ -20,26 +20,26 @@ export default class FileTree extends HTMLElement {
     `;
 
     this._fileList = this.shadowRoot.querySelector('#file-list');
-    this._dirListItemTemplate = this.shadowRoot.querySelector('#dir-list-item');
+    this._dirItemTemplate = this.shadowRoot.querySelector('#dir-item');
   }
 
   static get observedAttributes() {
-    return ['report'];
+    return ['src'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'report') {
-      this._report = JSON.parse(newValue);
+    if (name === 'src') {
+      this._src = JSON.parse(newValue);
     }
     this.render();
   }
 
   render() {
-    for (const file of this._report) {
-      const dirListItem = document.importNode(this._dirListItemTemplate.content, true);
-      const dirButton = dirListItem.querySelector('.dir-button');
-      dirButton.innerHTML = file.entorypoint.path;
-      this._fileList.appendChild(dirListItem);
+    for (const pos of this._src) {
+      const dirItem = document.importNode(this._dirItemTemplate.content, true);
+      const dirButton = dirItem.querySelector('.dir-button');
+      dirButton.innerHTML = pos.entorypoint.path;
+      this._fileList.appendChild(dirItem);
     }
   }
 }

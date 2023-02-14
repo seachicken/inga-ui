@@ -6,7 +6,7 @@
   "scripts": {
     "render": "node render.js",
     "dev": "npm run render && vite",
-    "build": "npm run render $npm_config_json && vite build",
+    "build": "npm run render $npm_config_json $npm_config_url $npm_config_sha && vite build",
     "preview": "vite preview"
   },
   "repository": {
