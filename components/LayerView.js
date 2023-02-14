@@ -44,7 +44,7 @@ export default class LayerView extends HTMLElement {
     for (const pos of this._origins) {
       const codeItem = document.importNode(this._codeItemTemplate.content, true);
       const link = codeItem.querySelector('.link');
-      link.href = `${this._repoUrl}/blob/${this._headSha}/${pos.path}`;
+      link.href = `${this._repoUrl}/blob/${this._headSha}/${pos.path}#L${pos.line}`;
       link.innerHTML = pos.path;
       this._codeList.appendChild(codeItem);
     }
