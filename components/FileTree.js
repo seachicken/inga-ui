@@ -35,10 +35,20 @@ export default class FileTree extends HTMLElement {
   }
 
   render() {
-    for (const pos of this._src) {
+    for (let i = 0; i < this._src.length; i++) {
+      const pos = this._src[i];
       const dirItem = document.importNode(this._dirItemTemplate.content, true);
+
       const dirButton = dirItem.querySelector('.dir-button');
       dirButton.innerHTML = pos.entorypoint.path;
+      dirButton.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('click', {
+          bubbles: true,
+          composed: true,
+          detail: { index: i }
+        }));
+      });
+
       this._fileList.appendChild(dirItem);
     }
   }

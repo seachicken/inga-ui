@@ -10,7 +10,7 @@ const report = window['__inga_report__'];
 const repoUrl = window['__inga_repo_url__'];
 const headSha = window['__inga_head_sha__'];
 const filePoss = sort(report);
-const selectedOrigins = filePoss[0].origins;
+let selectedOrigins = filePoss.length > 0 ? filePoss[0].origins : [];
 
 document.querySelector('#app').innerHTML = `
   <div class="${tw`flex h-screen`}">
@@ -23,6 +23,15 @@ document.querySelector('#app').innerHTML = `
     </main>
   </div>
 `;
+
+const fileTree = document.querySelector('file-tree');
+const layerView = document.querySelector('layer-view');
+fileTree.addEventListener('click', e => {
+  if (e.detail.index) {
+    selectedOrigins = JSON.stringify(filePoss[e.detail.index].origins);
+    layerView.origins = selectedOrigins;
+  }
+});
 
 const nav = document.querySelector('nav');
 const separator = document.querySelector('#separator');

@@ -23,6 +23,10 @@ export default class LayerView extends HTMLElement {
     this._codeItemTemplate = this.shadowRoot.querySelector('#code-item');
   }
 
+  set origins(value) {
+    this.setAttribute('origins', value);
+  }
+
   static get observedAttributes() {
     return ['origins', 'repourl', 'headsha'];
   }

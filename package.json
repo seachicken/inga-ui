@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "render": "node render.js",
+    "render": "node render.js $npm_config_json $npm_config_url $npm_config_sha",
     "dev": "npm run render && vite",
-    "build": "npm run render $npm_config_json $npm_config_url $npm_config_sha && vite build",
+    "build": "npm run render && vite build",
     "preview": "vite preview"
   },
   "repository": {
