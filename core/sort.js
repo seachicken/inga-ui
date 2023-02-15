@@ -7,7 +7,7 @@ export function sort(report) {
   }
 
   for (const input of report) {
-    const found = results.find(r => equalsPos(input, r));
+    const found = results.find(r => equalsPos(input.entorypoint, r.entorypoint));
     if (found) {
       found.origins.push(input.origin);
     } else {
@@ -18,5 +18,10 @@ export function sort(report) {
     }
   }
 
-  return results;
+  function toString(pos) {
+    return `${pos.path}${pos.line}${pos.offset}`;
+  }
+
+  return results.sort((a, b) => toString(a.entorypoint)
+    .localeCompare(toString(b.entorypoint), undefined, { numeric: true }));
 }
