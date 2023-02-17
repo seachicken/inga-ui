@@ -7,13 +7,13 @@ export function sort(report) {
   }
 
   for (const input of report) {
-    const found = results.find(r => equalsPos(input.entorypoint, r.entorypoint));
+    const found = results.find((r) => equalsPos(input.entorypoint, r.entorypoint));
     if (found) {
       found.origins.push(input.origin);
     } else {
       results.push({
         entorypoint: input.entorypoint,
-        origins: [input.origin]
+        origins: [input.origin],
       });
     }
   }

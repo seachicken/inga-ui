@@ -6,9 +6,9 @@ import { sort } from './core/sort.js';
 window.customElements.define('file-tree', FileTree);
 window.customElements.define('layer-view', LayerView);
 
-const report = window['__inga_report__'];
-const repoUrl = window['__inga_repo_url__'];
-const headSha = window['__inga_head_sha__'];
+const report = window.inga_report;
+const repoUrl = window.inga_repo_url;
+const headSha = window.inga_head_sha;
 const filePoss = sort(report);
 let selectedOrigins = filePoss.length > 0 ? filePoss[0].origins : [];
 
@@ -24,24 +24,25 @@ document.querySelector('#app').innerHTML = `
   </div>
 `;
 
+const nav = document.querySelector('nav');
 const fileTree = document.querySelector('file-tree');
+const separator = document.querySelector('#separator');
 const layerView = document.querySelector('layer-view');
-fileTree.addEventListener('click', e => {
+
+fileTree.addEventListener('click', (e) => {
   if (e.detail.index) {
     selectedOrigins = JSON.stringify(filePoss[e.detail.index].origins);
     layerView.origins = selectedOrigins;
   }
 });
 
-const nav = document.querySelector('nav');
-const separator = document.querySelector('#separator');
-separator.addEventListener('mousedown', e => {
-  document.addEventListener('mousemove', risizeSeperator);
-  document.addEventListener('mouseup', e => {
-    document.removeEventListener('mousemove', risizeSeperator);
-  });
-});
-
 function risizeSeperator(e) {
   nav.style.flexBasis = `${e.x}px`;
 }
+
+separator.addEventListener('mousedown', () => {
+  document.addEventListener('mousemove', risizeSeperator);
+  document.addEventListener('mouseup', () => {
+    document.removeEventListener('mousemove', risizeSeperator);
+  });
+});

@@ -1,12 +1,12 @@
 import { create, cssomSheet } from 'twind';
 
-const sheet = cssomSheet({ target: new CSSStyleSheet() })
+const sheet = cssomSheet({ target: new CSSStyleSheet() });
 const { tw } = create({ sheet });
 
 export default class LayerView extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
       <ul id="code-list" class="${tw`ml-2 mt-3`}">
@@ -19,8 +19,12 @@ export default class LayerView extends HTMLElement {
       </template>
     `;
 
-    this._codeList = this.shadowRoot.querySelector('#code-list');
-    this._codeItemTemplate = this.shadowRoot.querySelector('#code-item');
+    this.codeList = this.shadowRoot.querySelector('#code-list');
+    this.codeItemTemplate = this.shadowRoot.querySelector('#code-item');
+  }
+
+  get origins() {
+    return this.getAttribute('origins');
   }
 
   set origins(value) {
@@ -33,25 +37,25 @@ export default class LayerView extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'origins') {
-      this._origins = JSON.parse(newValue);
+      this.parsedOrigins = JSON.parse(newValue);
     }
     if (name === 'repourl') {
-      this._repoUrl = newValue;
+      this.repoUrl = newValue;
     }
     if (name === 'headsha') {
-      this._headSha = newValue;
+      this.headSha = newValue;
     }
     this.render();
   }
 
   render() {
-    this._codeList.innerHTML = '';
-    for (const pos of this._origins) {
-      const codeItem = document.importNode(this._codeItemTemplate.content, true);
+    this.codeList.innerHTML = '';
+    for (const pos of this.parsedOrigins) {
+      const codeItem = document.importNode(this.codeItemTemplate.content, true);
       const link = codeItem.querySelector('.link');
-      link.href = `${this._repoUrl}/blob/${this._headSha}/${pos.path}#L${pos.line}`;
+      link.href = `${this.repoUrl}/blob/${this.headSha}/${pos.path}#L${pos.line}`;
       link.innerHTML = pos.path;
-      this._codeList.appendChild(codeItem);
+      this.codeList.appendChild(codeItem);
     }
   }
 }
