@@ -1,7 +1,7 @@
 import { tw } from 'twind';
 import FileTree from './components/FileTree.js';
 import LayerView from './components/LayerView.js';
-import { getFilePoss } from './core/sort.js';
+import { fileType, getFilePoss } from './core/sort.js';
 
 window.customElements.define('file-tree', FileTree);
 window.customElements.define('layer-view', LayerView);
@@ -10,7 +10,7 @@ const report = window.inga_report;
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const filePoss = getFilePoss(report);
-let selectedOrigins = filePoss.length > 0 ? filePoss[0].origins : [];
+let selectedOrigins = filePoss.find((p) => p.type === fileType.FILE)?.origins || [];
 
 document.querySelector('#app').innerHTML = `
   <div class="${tw`flex h-screen`}">
