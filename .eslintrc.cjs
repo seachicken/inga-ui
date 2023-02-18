@@ -18,6 +18,7 @@ module.exports = {
       },
     ],
     'import/prefer-default-export': 'off',
+    'no-continue': 'off',
     'no-restricted-syntax': ['error',
       {
         selector: 'ForInStatement',

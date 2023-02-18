@@ -1,7 +1,7 @@
 import { tw } from 'twind';
 import FileTree from './components/FileTree.js';
 import LayerView from './components/LayerView.js';
-import { sort } from './core/sort.js';
+import { getFilePoss } from './core/sort.js';
 
 window.customElements.define('file-tree', FileTree);
 window.customElements.define('layer-view', LayerView);
@@ -9,7 +9,7 @@ window.customElements.define('layer-view', LayerView);
 const report = window.inga_report;
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
-const filePoss = sort(report);
+const filePoss = getFilePoss(report);
 let selectedOrigins = filePoss.length > 0 ? filePoss[0].origins : [];
 
 document.querySelector('#app').innerHTML = `
