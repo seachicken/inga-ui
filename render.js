@@ -1,8 +1,8 @@
 import fs from 'fs';
 
-const jsonPath = process.argv[2] || './data/report.json';
-const repoUrl = process.argv[3] || 'https://github.com/owner/repo';
-const headSha = process.argv[4] || '';
+const jsonPath = process.env.npm_config_ingapath || './data/report.json';
+const repoUrl = process.env.npm_config_ingaurl || 'https://github.com/owner/repo';
+const headSha = process.env.npm_config_ingasha || '';
 
 const template = fs.readFileSync('./templates/index.html');
 const report = fs.readFileSync(jsonPath);
