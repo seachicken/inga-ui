@@ -54,20 +54,41 @@ export function groupBySubdirctories(dirsList) {
 function groupByEntorypoint(poss) {
   const results = [];
 
-  function equalsPos(a, b) {
-    return a.path === b.path && a.name === b.name
-      && a.line === b.line && a.offset === b.offset;
+  function equalsDeclaration(entorypoint, inputEntorypoint) {
+    return entorypoint.name === inputEntorypoint.name
+      && entorypoint.line === inputEntorypoint.line
+      && entorypoint.offset === inputEntorypoint.offset;
   }
 
   for (const pos of poss) {
-    const found = results.find((r) => equalsPos(pos.entorypoint, r.entorypoint));
-    if (found) {
-      found.origins.push(pos.origin);
+    const paths = pos.entorypoint.path.split('/');
+    const foundDeclarations = results
+      .find((r) => pos.entorypoint.path === r.path)?.declarations || [];
+
+    if (foundDeclarations.length > 0) {
+      const foundDeclaration = foundDeclarations.find((d) => equalsDeclaration(d, pos.entorypoint));
+      if (foundDeclaration) {
+        foundDeclaration.origins.push(pos.origin);
+      } else {
+        foundDeclarations.push(
+          {
+            ...pos.entorypoint,
+            paths,
+            origins: [pos.origin],
+          },
+        );
+      }
     } else {
-      const paths = pos.entorypoint.path.split('/');
       results.push({
-        entorypoint: { ...pos.entorypoint, paths },
-        origins: [pos.origin],
+        path: pos.entorypoint.path,
+        paths,
+        declarations: [
+          {
+            ...pos.entorypoint,
+            paths,
+            origins: [pos.origin],
+          },
+        ],
       });
     }
   }
@@ -75,27 +96,55 @@ function groupByEntorypoint(poss) {
   return results;
 }
 
-function sortByAlphabeticaly(poss) {
-  function toString(pos) {
-    return `${pos.path}${pos.line}${pos.offset}`;
+function sortByAlphabet(poss) {
+  const results = poss.sort((a, b) => a.path
+    .localeCompare(b.path, undefined, { numeric: true }));
+
+  function declarationToString(pos) {
+    return `${pos.line} ${pos.offset}`;
   }
 
-  return poss.sort((a, b) => toString(a.entorypoint)
-    .localeCompare(toString(b.entorypoint), undefined, { numeric: true }));
+  for (const result of results) {
+    results.declarations = result.declarations.sort((a, b) => declarationToString(a)
+      .localeCompare(declarationToString(b), undefined, { numeric: true }));
+  }
+
+  return results;
+}
+
+function groupByFile(poss) {
+  const results = [];
+
+  for (const pos of poss) {
+    const found = results.find((r) => pos.path === r.path);
+    if (found) {
+      found.declarations = found.declarations.concat(pos.declarations || [pos]);
+    } else {
+      results.push(
+        {
+          ...pos,
+          declarations: pos.declarations || [pos],
+        },
+      );
+    }
+  }
+
+  return results;
 }
 
 export function getFilePoss(reportedPoss) {
   let sortedPoss = groupByEntorypoint(reportedPoss);
-  sortedPoss = sortByAlphabeticaly(sortedPoss);
+  sortedPoss = sortByAlphabet(sortedPoss);
+  sortedPoss = groupByFile(sortedPoss);
 
   function splitShortestPoss(poss) {
     let pathLength = 0;
     let idx = 0;
     for (const pos of poss) {
-      if (pathLength !== 0 && pos.entorypoint.paths.length !== pathLength) {
+      if (pathLength !== 0 && pos.paths.length !== pathLength) {
         break;
       }
-      pathLength = pos.entorypoint.paths.length;
+      pathLength = pos.paths.length;
       idx += 1;
     }
     const tail = poss.splice(idx);
@@ -103,24 +152,25 @@ export function getFilePoss(reportedPoss) {
   }
 
   let splitPoss = [];
+  let tempPoss = [...sortedPoss];
 
-  while (sortedPoss.length > 0) {
-    const [head, tail] = splitShortestPoss(sortedPoss);
+  while (tempPoss.length > 0) {
+    const [head, tail] = splitShortestPoss(tempPoss);
     splitPoss = head.concat(splitPoss);
-    sortedPoss = tail;
+    tempPoss = tail;
   }
 
   function extractDirs(poss) {
-    return poss.map((p) => p.entorypoint.paths.splice(0, p.entorypoint.paths.length - 1));
+    return poss.map((p) => p.paths.splice(0, p.paths.length - 1));
   }
 
   function extractFile(pos) {
-    return pos.entorypoint.paths.splice(-1)[0];
+    return pos.paths.splice(-1)[0];
   }
 
   const dirsList = groupBySubdirctories(extractDirs(splitPoss));
-  const results = [];
   let prevDirs;
+  const results = [];
 
   for (let i = 0; i < dirsList.length; i += 1) {
     const dirs = dirsList[i];
@@ -146,13 +196,16 @@ export function getFilePoss(reportedPoss) {
     results.push({
       type: fileType.FILE,
       nest: dirs.length === 0 ? 0 : nest + 1,
-      entorypoint: {
-        path: extractFile(filePos),
-        name: filePos.entorypoint.name,
-        line: filePos.entorypoint.line,
-        offset: filePos.entorypoint.offset,
-      },
-      origins: filePos.origins,
+      path: extractFile(filePos),
+      declarations: filePos.declarations.map((ed) => ({
+        path: ed.path,
+        name: ed.name,
+        line: ed.line,
+        offset: ed.offset,
+        origins: groupByFile(ed.origins).map((o) => ({
+          declarations: o.declarations,
+        })),
+      })),
     });
   }
 

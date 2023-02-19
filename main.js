@@ -10,7 +10,8 @@ const report = window.inga_report;
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const filePoss = getFilePoss(report);
-let selectedOrigins = filePoss.find((p) => p.type === fileType.FILE)?.origins || [];
+const selectedEntorypoints = filePoss.find((p) => p.type === fileType.FILE)?.declarations || [];
+const selectedOrigins = selectedEntorypoints[0]?.origins[0]?.declarations || [];
 
 document.querySelector('#app').innerHTML = `
   <div class="${tw`flex h-screen`}">
@@ -18,8 +19,9 @@ document.querySelector('#app').innerHTML = `
       <file-tree src=${JSON.stringify(filePoss)} onclick=></file-tree>
     </nav>
     <div id="separator" class="${tw`cursor-col-resize border-1`}"></div>
-    <main>
-      <layer-view origins=${JSON.stringify(selectedOrigins)} repourl=${repoUrl} headsha=${headSha}></layer-view>
+    <main class="${tw`flex`}">
+      <layer-view id="entorypoint-layer-view" origins=${JSON.stringify(selectedEntorypoints)} repourl=${repoUrl} headsha=${headSha}></layer-view>
+      <layer-view id="origin-layer-view" origins=${JSON.stringify(selectedOrigins)} repourl=${repoUrl} headsha=${headSha}></layer-view>
     </main>
   </div>
 `;
@@ -27,12 +29,14 @@ document.querySelector('#app').innerHTML = `
 const nav = document.querySelector('nav');
 const fileTree = document.querySelector('file-tree');
 const separator = document.querySelector('#separator');
-const layerView = document.querySelector('layer-view');
+const entorypointLayerView = document.querySelector('#entorypoint-layer-view');
+const originLayerView = document.querySelector('#origin-layer-view');
 
 fileTree.addEventListener('click', (e) => {
   if (e.detail.index) {
-    selectedOrigins = JSON.stringify(filePoss[e.detail.index].origins);
-    layerView.origins = selectedOrigins;
+    const entorypoints = filePoss[e.detail.index].declarations;
+    entorypointLayerView.origins = JSON.stringify(entorypoints);
+    originLayerView.origins = JSON.stringify(entorypoints[0]?.origins[0]?.declarations || []);
   }
 });
 

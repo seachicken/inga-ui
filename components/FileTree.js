@@ -71,7 +71,7 @@ export default class FileTree extends HTMLElement {
         const head = fileButton.querySelector('.head');
         head.classList.add(tw(`ml-${pos.nest * 2}`));
         const name = fileButton.querySelector('.name');
-        name.innerHTML = pos.entorypoint.path;
+        name.innerHTML = pos.path;
         fileButton.addEventListener('click', () => {
           this.dispatchEvent(new CustomEvent('click', {
             bubbles: true,

@@ -13,8 +13,8 @@ export default class LayerView extends HTMLElement {
       </ul>
 
       <template id="code-item">
-        <li class="${tw`w-80 my-2 p-2 border break-words hover:bg-gray-50`}">
-          <span class="name"></span>
+        <li class="${tw`w-80 my-2 p-2 border truncate hover:bg-gray-50`}">
+          <div class="name"></div>
           <a class="link ${tw`text-xs text-blue-500 underline`}"></a>
         </li>
       </template>

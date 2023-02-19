@@ -8,7 +8,7 @@ import {
   groupBySubdirctories,
 } from './sort.js';
 
-test('group by entorypoint', () => {
+test('group by entorypoint', { only: false }, () => {
   assert.deepEqual(
     getFilePoss([
       {
@@ -24,7 +24,15 @@ test('group by entorypoint', () => {
           path: 'a/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
-          path: 'b/B.java', name: 'a', line: 1, offset: 1,
+          path: 'b/A.java', name: 'b', line: 2, offset: 1,
+        },
+      },
+      {
+        entorypoint: {
+          path: 'a/A.java', name: 'b', line: 2, offset: 1,
+        },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
         },
       },
     ]),
@@ -37,15 +45,49 @@ test('group by entorypoint', () => {
       {
         type: fileType.FILE,
         nest: 1,
-        entorypoint: {
-          path: 'A.java', name: 'a', line: 1, offset: 1,
-        },
-        origins: [
+        path: 'A.java',
+        declarations: [
           {
-            path: 'b/A.java', name: 'a', line: 1, offset: 1,
+            path: 'a/A.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                  {
+                    path: 'b/A.java',
+                    name: 'b',
+                    line: 2,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
           },
           {
-            path: 'b/B.java', name: 'a', line: 1, offset: 1,
+            path: 'a/A.java',
+            name: 'b',
+            line: 2,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -53,17 +95,23 @@ test('group by entorypoint', () => {
   );
 });
 
-test('sort with a root file and a file in directories', () => {
+test('sort with a root file and a file in directories', { only: false }, () => {
   assert.deepEqual(
     getFilePoss([
       {
         entorypoint: {
           path: 'A.java', name: 'a', line: 1, offset: 1,
         },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
       },
       {
         entorypoint: {
           path: 'a/B.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
         },
       },
     ]),
@@ -76,33 +124,73 @@ test('sort with a root file and a file in directories', () => {
       {
         type: fileType.FILE,
         nest: 1,
-        entorypoint: {
-          path: 'B.java', name: 'a', line: 1, offset: 1,
-        },
-        origins: [undefined],
+        path: 'B.java',
+        declarations: [
+          {
+            path: 'a/B.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       {
         type: fileType.FILE,
         nest: 0,
-        entorypoint: {
-          path: 'A.java', name: 'a', line: 1, offset: 1,
-        },
-        origins: [undefined],
+        path: 'A.java',
+        declarations: [
+          {
+            path: 'A.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     ],
   );
 });
 
-test('sort with multiple files in a directory', () => {
+test('sort with multiple files in a directory', { only: false }, () => {
   assert.deepEqual(
     getFilePoss([
       {
         entorypoint: {
           path: 'b/A.java', name: 'b', line: 2, offset: 1,
         },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
       },
       {
         entorypoint: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
           path: 'b/A.java', name: 'a', line: 1, offset: 1,
         },
       },
@@ -116,39 +204,75 @@ test('sort with multiple files in a directory', () => {
       {
         type: fileType.FILE,
         nest: 1,
-        entorypoint: {
-          path: 'A.java', name: 'a', line: 1, offset: 1,
-        },
-        origins: [undefined],
-      },
-      {
-        type: fileType.FILE,
-        nest: 1,
-        entorypoint: {
-          path: 'A.java', name: 'b', line: 2, offset: 1,
-        },
-        origins: [undefined],
+        path: 'A.java',
+        declarations: [
+          {
+            path: 'b/A.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            path: 'b/A.java',
+            name: 'b',
+            line: 2,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     ],
   );
 });
 
-test('sort with multiple files in nested directories', () => {
+test('sort with multiple files in nested directories', { only: true }, () => {
   assert.deepEqual(
     getFilePoss([
       {
         entorypoint: {
           path: 'a/b/c/A.java', name: 'a', line: 1, offset: 1,
         },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
       },
       {
         entorypoint: {
           path: 'a/b/c/A.java', name: 'b', line: 2, offset: 1,
         },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
       },
       {
         entorypoint: {
           path: 'a/b/A.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
         },
       },
     ]),
@@ -166,26 +290,70 @@ test('sort with multiple files in nested directories', () => {
       {
         type: fileType.FILE,
         nest: 2,
-        entorypoint: {
-          path: 'A.java', name: 'a', line: 1, offset: 1,
-        },
-        origins: [undefined],
-      },
-      {
-        type: fileType.FILE,
-        nest: 2,
-        entorypoint: {
-          path: 'A.java', name: 'b', line: 2, offset: 1,
-        },
-        origins: [undefined],
+        path: 'A.java',
+        declarations: [
+          {
+            path: 'a/b/c/A.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            path: 'a/b/c/A.java',
+            name: 'b',
+            line: 2,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       {
         type: fileType.FILE,
         nest: 1,
-        entorypoint: {
-          path: 'A.java', name: 'a', line: 1, offset: 1,
-        },
-        origins: [undefined],
+        path: 'A.java',
+        declarations: [
+          {
+            path: 'a/b/A.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [
+              {
+                declarations: [
+                  {
+                    path: 'b/A.java',
+                    name: 'a',
+                    line: 1,
+                    offset: 1,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     ],
   );
