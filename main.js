@@ -29,7 +29,7 @@ const selectedOrigins = selectedEntorypoints[0]?.origins[0]?.declarations || [];
 
 document.querySelector('#app').innerHTML = `
   <header class="${tw`flex items-center w-full p-2 text-2xl bg-green`}">
-    <img class="${tw`w-10`}" src="./public/logo.png">
+    <img class="${tw`w-10`}" src="logo.png">
     <span class="${tw`ml-2 text-white`}">Inga</span>
   </header>
   <div class="${tw`flex h-screen`}">
