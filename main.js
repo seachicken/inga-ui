@@ -10,13 +10,14 @@ const report = window.inga_report;
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const filePoss = getFilePoss(report);
-const selectedEntorypoints = filePoss.find((p) => p.type === fileType.FILE)?.declarations || [];
+let selectedFileIndex = filePoss.findIndex((p) => p.type === fileType.FILE);
+const selectedEntorypoints = selectedFileIndex < 0 ? [] : filePoss[selectedFileIndex].declarations;
 const selectedOrigins = selectedEntorypoints[0]?.origins[0]?.declarations || [];
 
 document.querySelector('#app').innerHTML = `
   <div class="${tw`flex h-screen`}">
-    <nav class="${tw`w-64 min-w-48`}">
-      <file-tree src=${JSON.stringify(filePoss)} onclick=></file-tree>
+    <nav class="${tw`w-64 pt-2 pl-2`}">
+      <file-tree src=${JSON.stringify(filePoss)} defaultindex=${selectedFileIndex} onclick=></file-tree>
     </nav>
     <div id="separator" class="${tw`cursor-col-resize border-1`}"></div>
     <main class="${tw`flex`}">
@@ -32,12 +33,18 @@ const separator = document.querySelector('#separator');
 const entorypointLayerView = document.querySelector('#entorypoint-layer-view');
 const originLayerView = document.querySelector('#origin-layer-view');
 
-fileTree.addEventListener('click', (e) => {
-  if (e.detail.index) {
-    const entorypoints = filePoss[e.detail.index].declarations;
-    entorypointLayerView.origins = JSON.stringify(entorypoints);
-    originLayerView.origins = JSON.stringify(entorypoints[0]?.origins[0]?.declarations || []);
-  }
+fileTree.addEventListener('itemselect', (e) => {
+  selectedFileIndex = e.detail.index;
+  const entorypoints = filePoss[selectedFileIndex].declarations;
+  entorypointLayerView.origins = JSON.stringify(entorypoints);
+  originLayerView.origins = JSON.stringify(entorypoints[0]?.origins[0]?.declarations || []);
+});
+
+entorypointLayerView.addEventListener('itemselect', (e) => {
+  const entorypoints = filePoss[selectedFileIndex].declarations;
+  originLayerView.origins = JSON.stringify(
+    entorypoints[e.detail.index].origins[0]?.declarations || [],
+  );
 });
 
 function risizeSeperator(e) {

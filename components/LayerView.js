@@ -9,11 +9,11 @@ export default class LayerView extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <ul id="code-list" class="${tw`h-full px-5 border`}">
+      <ul id="code-list" class="${tw`h-full px-5 border-r`}">
       </ul>
 
       <template id="code-item">
-        <li class="${tw`w-80 my-2 p-2 border truncate hover:bg-gray-50`}">
+        <li class="item ${tw`w-80 my-2 p-2 border truncate hover:bg-gray-100`}">
           <div class="name"></div>
           <a class="link ${tw`text-xs text-blue-500 underline`}"></a>
         </li>
@@ -51,8 +51,26 @@ export default class LayerView extends HTMLElement {
 
   render() {
     this.codeList.innerHTML = '';
-    for (const pos of this.parsedOrigins) {
+
+    for (let i = 0; i < this.parsedOrigins.length; i += 1) {
+      const pos = this.parsedOrigins[i];
       const codeItem = document.importNode(this.codeItemTemplate.content, true);
+      const item = codeItem.querySelector('.item');
+      const selectStyle = tw('bg-gray-100');
+      if (i === 0) {
+        item.classList.add(selectStyle);
+      }
+      item.addEventListener('click', () => {
+        this.selectedIndex = i;
+        this.codeList.querySelectorAll('.item')
+          .forEach((it) => it.classList.remove(selectStyle));
+        item.classList.add(selectStyle);
+        this.dispatchEvent(new CustomEvent('itemselect', {
+          bubbles: true,
+          composed: true,
+          detail: { index: i },
+        }));
+      });
       const link = codeItem.querySelector('.link');
       link.href = `${this.repoUrl}/blob/${this.headSha}/${pos.path}#L${pos.line}`;
       link.innerHTML = `${pos.path}#L${pos.line}`;
