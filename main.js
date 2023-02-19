@@ -1,7 +1,20 @@
-import { tw } from 'twind';
+import { setup, tw } from 'twind';
+import * as colors from 'twind/colors';
 import FileTree from './components/FileTree.js';
 import LayerView from './components/LayerView.js';
 import { fileType, getFilePoss } from './core/sort.js';
+import tokens from './tokens.json';
+
+setup({
+  theme: {
+    colors: {
+      black: colors.black,
+      green: tokens.global.green.value,
+      gray: colors.trueGray,
+      white: colors.white,
+    },
+  },
+});
 
 window.customElements.define('file-tree', FileTree);
 window.customElements.define('layer-view', LayerView);
@@ -15,6 +28,10 @@ const selectedEntorypoints = selectedFileIndex < 0 ? [] : filePoss[selectedFileI
 const selectedOrigins = selectedEntorypoints[0]?.origins[0]?.declarations || [];
 
 document.querySelector('#app').innerHTML = `
+  <header class="${tw`flex items-center w-full p-2 text-2xl bg-green`}">
+    <img class="${tw`w-10`}" src="./public/logo.png">
+    <span class="${tw`ml-2 text-white`}">Inga</span>
+  </header>
   <div class="${tw`flex h-screen`}">
     <nav class="${tw`w-64 pt-2 pl-2`}">
       <file-tree src=${JSON.stringify(filePoss)} defaultindex=${selectedFileIndex} onclick=></file-tree>
