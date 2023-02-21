@@ -123,6 +123,7 @@ function groupByFile(poss) {
       results.push(
         {
           ...pos,
+          paths: pos.path.split('/'),
           declarations: pos.declarations || [pos],
         },
       );
@@ -203,6 +204,7 @@ export function getFilePoss(reportedPoss) {
         line: ed.line,
         offset: ed.offset,
         origins: groupByFile(ed.origins).map((o) => ({
+          path: extractFile(o),
           declarations: o.declarations,
         })),
       })),

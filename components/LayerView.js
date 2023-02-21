@@ -66,38 +66,43 @@ export default class LayerView extends HTMLElement {
     this.codeList.innerHTML = '';
     const declarationListRoot = document.importNode(this.declarationListTemplate.content, true);
     const declarationList = declarationListRoot.querySelector('.list');
-    const codeItemRoot = document.importNode(this.codeItemTemplate.content, true);
-    const codeItem = codeItemRoot.querySelector('.item');
-    const codeName = codeItem.querySelector('.name');
-    codeName.innerHTML = `${this.parsedOrigins[0].path.split('/').splice(-1)[0]}`;
 
-    for (let i = 0; i < this.parsedOrigins.length; i += 1) {
-      const pos = this.parsedOrigins[i];
-      const declarationItemRoot = document.importNode(this.declarationItemTemplate.content, true);
-      const declarationItem = declarationItemRoot.querySelector('.item');
-      const selectStyle = tw('bg-gray-100');
-      if (i === 0) {
-        declarationItem.classList.add(selectStyle);
+    for (let pi = 0; pi < this.parsedOrigins.length; pi += 1) {
+      const pos = this.parsedOrigins[pi];
+      const codeItemRoot = document.importNode(this.codeItemTemplate.content, true);
+      const codeItem = codeItemRoot.querySelector('.item');
+      const codeName = codeItem.querySelector('.name');
+      codeName.innerHTML = `${pos.path}`;
+
+      for (let di = 0; di < pos.declarations.length; di += 1) {
+        const i = pi + di;
+        const dec = pos.declarations[di];
+        const declarationItemRoot = document.importNode(this.declarationItemTemplate.content, true);
+        const declarationItem = declarationItemRoot.querySelector('.item');
+        const selectStyle = tw('bg-gray-100');
+        if (i === 0) {
+          declarationItem.classList.add(selectStyle);
+        }
+        declarationItem.addEventListener('click', () => {
+          this.selectedIndex = i;
+          this.codeList.querySelectorAll('.item')
+            .forEach((it) => it.classList.remove(selectStyle));
+          declarationItem.classList.add(selectStyle);
+          this.dispatchEvent(new CustomEvent('itemselect', {
+            bubbles: true,
+            composed: true,
+            detail: { index: i },
+          }));
+        });
+        const link = declarationItem.querySelector('.link');
+        link.href = `${this.repoUrl}/blob/${this.headSha}/${dec.path}#L${dec.line}`;
+        link.innerHTML = `${dec.path}#L${dec.line}`;
+        const name = declarationItem.querySelector('.name');
+        name.innerHTML = dec.name;
+
+        codeItem.appendChild(declarationItem);
+        declarationList.appendChild(codeItem);
       }
-      declarationItem.addEventListener('click', () => {
-        this.selectedIndex = i;
-        this.codeList.querySelectorAll('.item')
-          .forEach((it) => it.classList.remove(selectStyle));
-        declarationItem.classList.add(selectStyle);
-        this.dispatchEvent(new CustomEvent('itemselect', {
-          bubbles: true,
-          composed: true,
-          detail: { index: i },
-        }));
-      });
-      const link = declarationItem.querySelector('.link');
-      link.href = `${this.repoUrl}/blob/${this.headSha}/${pos.path}#L${pos.line}`;
-      link.innerHTML = `${pos.path}#L${pos.line}`;
-      const name = declarationItem.querySelector('.name');
-      name.innerHTML = pos.name;
-
-      codeItem.appendChild(declarationItem);
-      declarationList.appendChild(codeItem);
     }
 
     this.codeList.appendChild(declarationList);
