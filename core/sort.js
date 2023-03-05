@@ -3,6 +3,11 @@ export const fileType = {
   FILE: 2,
 };
 
+export const groupKey = {
+  ENTORYPOINT: 1,
+  ORIGIN: 2,
+};
+
 export function getDuplicateLength(a, b) {
   let len = 0;
   for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
@@ -51,28 +56,30 @@ export function groupBySubdirctories(dirsList) {
   return results;
 }
 
-function groupByEntorypoint(poss) {
+export function equalsDeclaration(a, b) {
+  return a.path === b.path
+    && a.name === b.name
+    && a.line === b.line
+    && a.offset === b.offset;
+}
+
+function groupByKey(poss, key) {
   const results = [];
 
-  function equalsDeclaration(entorypoint, inputEntorypoint) {
-    return entorypoint.name === inputEntorypoint.name
-      && entorypoint.line === inputEntorypoint.line
-      && entorypoint.offset === inputEntorypoint.offset;
-  }
-
   for (const pos of poss) {
-    const paths = pos.entorypoint.path.split('/');
+    const target = key === groupKey.ENTORYPOINT ? pos.entorypoint : pos.origin;
+    const paths = target.path.split('/');
     const foundDeclarations = results
-      .find((r) => pos.entorypoint.path === r.path)?.declarations || [];
+      .find((r) => target.path === r.path)?.declarations || [];
 
     if (foundDeclarations.length > 0) {
-      const foundDeclaration = foundDeclarations.find((d) => equalsDeclaration(d, pos.entorypoint));
+      const foundDeclaration = foundDeclarations.find((d) => equalsDeclaration(d, target));
       if (foundDeclaration) {
         foundDeclaration.origins.push(pos.origin);
       } else {
         foundDeclarations.push(
           {
-            ...pos.entorypoint,
+            ...target,
             paths,
             origins: [pos.origin],
           },
@@ -80,11 +87,11 @@ function groupByEntorypoint(poss) {
       }
     } else {
       results.push({
-        path: pos.entorypoint.path,
+        path: target.path,
         paths,
         declarations: [
           {
-            ...pos.entorypoint,
+            ...target,
             paths,
             origins: [pos.origin],
           },
@@ -133,8 +140,8 @@ function groupByFile(poss) {
   return results;
 }
 
-export function getFilePoss(reportedPoss) {
-  let sortedPoss = groupByEntorypoint(reportedPoss);
+export function getFilePoss(reportedPoss, key = groupKey.ENTORYPOINT) {
+  let sortedPoss = groupByKey(reportedPoss, key);
   sortedPoss = sortByAlphabet(sortedPoss);
   sortedPoss = groupByFile(sortedPoss);
 
