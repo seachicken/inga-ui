@@ -137,13 +137,6 @@ export function getDuplicateLength(a, b) {
   return len;
 }
 
-export function equalsDeclaration(a, b) {
-  return a.path === b.path
-    && a.name === b.name
-    && a.line === b.line
-    && a.offset === b.offset;
-}
-
 function groupByKey(poss, key) {
   const results = [];
 
@@ -219,4 +212,11 @@ function groupByFile(poss) {
   }
 
   return results;
+}
+
+function equalsDeclaration(a, b) {
+  return a.path === b.path
+    && a.name === b.name
+    && a.line === b.line
+    && a.offset === b.offset;
 }
