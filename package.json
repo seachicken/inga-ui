@@ -8,7 +8,8 @@
     "dev": "npm run render && vite",
     "test": "node --test",
     "build": "npm run render && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "print-pr": "node print-pr.js"
   },
   "repository": {
     "type": "git",
