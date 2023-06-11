@@ -9,7 +9,8 @@
     "test": "node --test",
     "build": "npm run render && vite build",
     "preview": "vite preview",
-    "print-pr": "node print-pr.js"
+    "print-pr": "node print-pr.js",
+    "send-pr": "bash send-pr.sh"
   },
   "repository": {
     "type": "git",
