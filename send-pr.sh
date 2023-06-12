@@ -15,6 +15,5 @@ echo "HEAD_SHA: $HEAD_SHA"
 PR_COMMENT=$(npm run --silent print-pr --ingapath=${INGA_WORK_PATH}/reports/report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA})
 
 cd $INGA_WORK_PATH
-
-gh pr comment $GITHUB_URL --body "$PR_COMMENT" --edit-last
+gh pr comment --body "$PR_COMMENT" --edit-last || gh pr comment --body "$PR_COMMENT"
 
