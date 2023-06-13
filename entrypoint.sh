@@ -4,6 +4,8 @@ COMMAND=$1
 INGA_WORK_PATH="${2-.}"
 HOME_DIR="${3-/inga-ui}"
 
+ls -lsa $INGA_WORK_PATH
+
 if ! type -p gh >/dev/null; then
   echo "gh not found on the system" >&2
   exit 1
