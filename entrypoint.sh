@@ -15,6 +15,7 @@ echo "HEAD_SHA: $HEAD_SHA"
 
 if [ $1 = "pr-report" ]; then
   PR_COMMENT=$(npm run --silent print-pr --ingapath=${INGA_WORK_PATH}/reports/report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA})
+  echo "PR_COMMENT: $PR_COMMENT"
   cd $INGA_WORK_PATH
   gh pr comment --body "$PR_COMMENT" --edit-last || gh pr comment --body "$PR_COMMENT"
 elif [ $1 = "html-report" ]; then
