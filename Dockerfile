@@ -17,6 +17,8 @@ RUN npm install
 
 FROM node:20-slim
 
+WORKDIR /inga-ui
+
 COPY --from=build /usr/share/keyrings/githubcli-archive-keyring.gpg /usr/share/keyrings/githubcli-archive-keyring.gpg
 COPY --from=build /inga-ui .
 
@@ -28,4 +30,8 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/g
     gh && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
+
+RUN echo "export PATH=$PATH:/inga-ui"
+
+ENTRYPOINT ["inga-ui"]
 

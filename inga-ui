@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 COMMAND=$1
-HOME_DIR="${2-.}"
+HOME_DIR="${2-/inga-ui}"
 
 if ! type -p gh >/dev/null; then
   echo "gh not found on the system" >&2
@@ -14,7 +14,6 @@ HEAD_SHA=$(gh pr view --json headRefOid --jq .headRefOid)
 echo "HEAD_SHA: $HEAD_SHA"
 
 cat - > $HOME_DIR/report.json
-cat -
 
 if [ $1 = "pr-report" ]; then
   PR_COMMENT=$(cd $HOME_DIR && npm run --silent print-pr \
