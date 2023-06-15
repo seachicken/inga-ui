@@ -17,8 +17,6 @@ RUN npm install
 
 FROM node:20-slim
 
-WORKDIR /inga-ui
-
 COPY --from=build /usr/share/keyrings/githubcli-archive-keyring.gpg /usr/share/keyrings/githubcli-archive-keyring.gpg
 COPY --from=build /inga-ui .
 
