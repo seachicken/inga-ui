@@ -31,6 +31,3 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/g
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
-RUN echo "alias pr-report='/inga-ui/entrypoint.sh'" >> ~/.bashrc
-RUN echo "alias html-report='/inga-ui/entrypoint.sh'" >> ~/.bashrc
-
