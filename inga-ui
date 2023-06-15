@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 COMMAND=$1
-HOME_DIR="${2-/inga-ui}"
+HOME_DIR="${2-.}"
 
 if ! type -p gh >/dev/null; then
   echo "gh not found on the system" >&2
