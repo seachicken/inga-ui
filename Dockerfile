@@ -31,7 +31,7 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/g
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
-ENV PATH $PATH:/inga-ui
+ENV PATH=/inga-ui:$PATH
 
 ENTRYPOINT ["inga-ui"]
 
