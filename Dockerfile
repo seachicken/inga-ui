@@ -33,5 +33,3 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/g
 
 ENV PATH=/inga-ui:$PATH
 
-ENTRYPOINT ["inga-ui-main"]
-
