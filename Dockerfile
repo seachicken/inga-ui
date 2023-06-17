@@ -30,3 +30,5 @@ RUN npm install
 
 COPY ./inga-ui /usr/local/bin/
 
+ENTRYPOINT ["inga-ui"]
+
