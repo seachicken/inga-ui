@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 COMMAND=$1
 HOME_DIR="${2-/inga-ui}"
