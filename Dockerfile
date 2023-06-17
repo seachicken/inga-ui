@@ -9,18 +9,12 @@ RUN apt-get update && \
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
   chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
 
-WORKDIR /inga-ui
-
-COPY . .
-RUN npm install
-
 
 FROM node:20-slim
 
 WORKDIR /inga-ui
 
 COPY --from=build /usr/share/keyrings/githubcli-archive-keyring.gpg /usr/share/keyrings/githubcli-archive-keyring.gpg
-COPY --from=build /inga-ui .
 
 RUN apt-get update && \
   apt-get install -y ca-certificates
@@ -31,4 +25,10 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/g
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["bash"]
+COPY . .
+RUN npm install
+
+COPY ./inga-ui /usr/local/bin/
+
+ENTRYPOINT ["inga-ui"]
+

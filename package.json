@@ -9,7 +9,7 @@
     "test": "node --test",
     "build": "npm run render && vite build",
     "preview": "vite preview",
-    "print-pr": "node print-pr.js"
+    "print-pr": "node pr-report.js"
   },
   "repository": {
     "type": "git",
