@@ -1,6 +1,6 @@
 [
   {
-    "entorypoint": {
+    "entrypoint": {
       "path": "src/index.js",
       "name": "hoge",
       "line": 1,
@@ -14,7 +14,7 @@
     }
   },
   {
-    "entorypoint": {
+    "entrypoint": {
       "path": "src/index.js",
       "name": "fuga",
       "line": 2,

@@ -8,11 +8,11 @@ import {
   groupBySubdirctories,
 } from './sort.js';
 
-test('group by entorypoint', () => {
+test('group by entrypoint', () => {
   assert.deepEqual(
     getFilePoss([
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -20,7 +20,7 @@ test('group by entorypoint', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -28,7 +28,7 @@ test('group by entorypoint', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -36,7 +36,7 @@ test('group by entorypoint', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/A.java', name: 'b', line: 2, offset: 1,
         },
         origin: {
@@ -120,7 +120,7 @@ test('sort with a root file and a file in directories', () => {
   assert.deepEqual(
     getFilePoss([
       {
-        entorypoint: {
+        entrypoint: {
           path: 'A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -128,7 +128,7 @@ test('sort with a root file and a file in directories', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/B.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -202,7 +202,7 @@ test('sort with multiple files in a directory', () => {
   assert.deepEqual(
     getFilePoss([
       {
-        entorypoint: {
+        entrypoint: {
           path: 'b/A.java', name: 'b', line: 2, offset: 1,
         },
         origin: {
@@ -210,7 +210,7 @@ test('sort with multiple files in a directory', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'b/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -277,7 +277,7 @@ test('sort with multiple files in nested directories', () => {
   assert.deepEqual(
     getFilePoss([
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/b/c/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {
@@ -285,7 +285,7 @@ test('sort with multiple files in nested directories', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/b/c/A.java', name: 'b', line: 2, offset: 1,
         },
         origin: {
@@ -293,7 +293,7 @@ test('sort with multiple files in nested directories', () => {
         },
       },
       {
-        entorypoint: {
+        entrypoint: {
           path: 'a/b/A.java', name: 'a', line: 1, offset: 1,
         },
         origin: {

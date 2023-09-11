@@ -4,11 +4,11 @@ export const fileType = {
 };
 
 export const groupKey = {
-  ENTORYPOINT: 1,
+  ENTRYPOINT: 1,
   ORIGIN: 2,
 };
 
-export function getFilePoss(reportedPoss, key = groupKey.ENTORYPOINT) {
+export function getFilePoss(reportedPoss, key = groupKey.ENTRYPOINT) {
   let sortedPoss = groupByKey(reportedPoss, key);
   sortedPoss = sortByAlphabet(sortedPoss);
   sortedPoss = groupByFile(sortedPoss);
@@ -141,7 +141,7 @@ function groupByKey(poss, key) {
   const results = [];
 
   for (const pos of poss) {
-    const target = key === groupKey.ENTORYPOINT ? pos.entorypoint : pos.origin;
+    const target = key === groupKey.ENTRYPOINT ? pos.entrypoint : pos.origin;
     const paths = target.path.split('/');
     const foundDeclarations = results
       .find((r) => target.path === r.path)?.declarations || [];
