@@ -1,5 +1,6 @@
 [
   {
+    "type": "entrypoint",
     "entrypoint": {
       "path": "src/index.js",
       "name": "hoge",
@@ -14,6 +15,7 @@
     }
   },
   {
+    "type": "entrypoint",
     "entrypoint": {
       "path": "src/index.js",
       "name": "fuga",

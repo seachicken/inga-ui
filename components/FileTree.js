@@ -1,23 +1,22 @@
-import { create, cssomSheet } from 'twind';
+import install from '@twind/with-web-components';
+import config from '../twind.config';
 import { fileType } from '../core/sort.js';
 
-const sheet = cssomSheet({ target: new CSSStyleSheet() });
-const { tw } = create({ sheet });
+const withTwind = install(config);
 
-export default class FileTree extends HTMLElement {
+export default class FileTree extends withTwind(HTMLElement) {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <ul id="file-list" class="${tw`truncate`}"></ul>
+      <ul id="file-list" class="truncate"></ul>
 
       <template id="dir-item">
         <tree-item class="item">
           <div slot="icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M.513 1.513A1.75 1.75 0 0 1 1.75 1h3.5c.55 0 1.07.26 1.4.7l.9 1.2a.25.25 0 0 0 .2.1H13a1 1 0 0 1 1 1v.5H2.75a.75.75 0 0 0 0 1.5h11.978a1 1 0 0 1 .994 1.117L15 13.25A1.75 1.75 0 0 1 13.25 15H1.75A1.75 1.75 0 0 1 0 13.25V2.75c0-.464.184-.91.513-1.237Z"></path></svg>
           </div>
-          <span slot="body" class="name ${tw`ml-2`}"></span>
+          <span slot="body" class="name ml-2"></span>
         </tree-item>
       </template>
 
@@ -26,13 +25,13 @@ export default class FileTree extends HTMLElement {
           <div slot="icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path></svg>
           </div>
-          <span slot="body" class="name ${tw`ml-2`}"></span>
+          <span slot="body" class="name ml-2"></span>
         </tree-item>
       </template>
 
       <template id="declaration-item-template">
         <tree-item class="declaration-item">
-          <a slot="body" class="name ${tw`text-xs text-blue-500 underline`}"></a>
+          <a slot="body" class="name text-xs text-blue-500 underline"></a>
         </tree-item>
       </template>
     `;
