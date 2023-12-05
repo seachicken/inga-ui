@@ -1,6 +1,7 @@
 [
   {
     "type": "entrypoint",
+    "service": "app",
     "entrypoint": {
       "path": "src/index.js",
       "name": "hoge",
@@ -16,6 +17,7 @@
   },
   {
     "type": "entrypoint",
+    "service": "app",
     "entrypoint": {
       "path": "src/index.js",
       "name": "fuga",

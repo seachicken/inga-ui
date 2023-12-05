@@ -15,6 +15,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       <template id="node-template">
         <div class="node absolute rounded border m-3 p-2">
           <p class="name"></p>
+          <p class="method"></p>
         </div>
       </template>
 
@@ -52,7 +53,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     const node = nodeRoot.querySelector('.node');
     node.style.left = `${depth * 130}px`;
     node.style.top = `${i * 70}px`;
-    node.querySelector('.name').innerHTML = graph.entrypoint.name;
+    node.querySelector('.name').innerHTML = graph.service;
+    node.querySelector('.method').innerHTML = graph.entrypoint.name;
     this.panel.appendChild(node);
     if (parent) {
       requestAnimationFrame(() => {
