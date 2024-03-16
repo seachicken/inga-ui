@@ -5,6 +5,7 @@ import * as colors from 'twind/colors';
 import tokens from './tokens.json';
 
 export default defineConfig({
+  hash: false,
   presets: [presetAutoprefix(), presetTailwind()],
   theme: {
     colors: {

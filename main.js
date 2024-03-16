@@ -20,7 +20,6 @@ const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const entrypointTree = getFilePoss(report.filter((p) => p.type === 'entrypoint'));
 const graphs = create(report);
-console.log(JSON.stringify(graphs, null, 2));
 const selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
 document.querySelector('#app').innerHTML = `
