@@ -13,7 +13,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="node-template">
-        <div class="node absolute rounded border m-3 p-2">
+        <div class="node absolute w-40 rounded border m-3 p-2">
           <p class="name"></p>
           <p class="method"></p>
         </div>
@@ -42,7 +42,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   render() {
-    for (let i = 0; i < this.graphs.length; i++) {
+    for (let i = 0; i < this.graphs.length; i += 1) {
       const graph = this.graphs[i];
       this.renderGraph(graph, i);
     }
@@ -51,7 +51,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   renderGraph(graph, i, depth = 0, parent = null) {
     const nodeRoot = document.importNode(this.nodeTemplate.content, true);
     const node = nodeRoot.querySelector('.node');
-    node.style.left = `${depth * 130}px`;
+    node.style.left = `${depth * 200}px`;
     node.style.top = `${i * 70}px`;
     node.querySelector('.name').innerHTML = graph.service;
     node.querySelector('.method').innerHTML = graph.entrypoint.name;
