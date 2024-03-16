@@ -28,11 +28,13 @@ document.querySelector('#app').innerHTML = `
     <span class="ml-2 text-white">Inga</span>
   </header>
   <div class="flex h-screen">
-    <div id="entrypoint-nav" class="overflow-y-auto w-72 ml-2 pt-2">
+    <div id="entrypoint-nav" class="overflow-y-auto w-72">
       <div class="flex items-center w-full">
-        <span class="ml-2 text-lg">Affected endpoints</span>
+        <span class="m-2 text-ms text-gray-500">Impacted entrypoints</span>
       </div>
-      <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl=${repoUrl} headsha=${headSha} defaultindex=${selectedFileIndex}></file-tree>
+      <div class="ml-2">
+        <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl=${repoUrl} headsha=${headSha} defaultindex=${selectedFileIndex}></file-tree>
+      </div>
     </div>
     <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
     <service-graph id="service-graph" class="w-full" src=${JSON.stringify(graphs)}></service-graph>
