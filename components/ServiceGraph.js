@@ -13,9 +13,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="node-template">
-        <div class="node absolute w-40 rounded border m-3 p-2">
+        <div class="node absolute w-40 rounded border border-black m-3 p-2">
           <p class="name"></p>
-          <p class="method"></p>
         </div>
       </template>
 
@@ -54,12 +53,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     node.style.left = `${depth * 200}px`;
     node.style.top = `${i * 70}px`;
     node.querySelector('.name').innerHTML = graph.service;
-    node.querySelector('.method').innerHTML = graph.entrypoint.name;
     this.panel.appendChild(node);
     if (parent) {
       requestAnimationFrame(() => {
-        //const edgeRoot = document.importNode(this.edgeTemplate.content, true);
-        //const edge2 = edgeRoot.querySelector('.edge');
         const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         const panelRect = this.panel.getBoundingClientRect();
         const nodeRect = node.getBoundingClientRect();
@@ -73,6 +69,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       });
     }
 
-    (graph.edges || []).forEach((n) => this.renderGraph(n, i, depth + 1, node));
+    (graph.edges || []).forEach((n, ni) => this.renderGraph(n, ni, depth + 1, node));
   }
 }
