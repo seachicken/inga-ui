@@ -71,7 +71,7 @@ function toNode(service) {
     innerConnections: groupByEntrypoint(service.poss),
   };
   if (service.neighbours) {
-    result.edges = service.neighbours.map((s) => toNode(s));
+    result.neighbours = service.neighbours.map((s) => toNode(s));
   }
   return result;
 }

@@ -69,6 +69,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       });
     }
 
-    (graph.edges || []).forEach((n, ni) => this.renderGraph(n, ni, depth + 1, node));
+    (graph.neighbours || []).forEach((n, ni) => this.renderGraph(n, ni, depth + 1, node));
   }
 }
