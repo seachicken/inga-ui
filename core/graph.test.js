@@ -50,7 +50,7 @@ test('create graphs', () => {
             ],
           },
         ],
-        edges: [
+        neighbours: [
           {
             service: 'B',
             innerConnections: [
@@ -211,7 +211,7 @@ test('create graphs with a common parent', () => {
             ],
           },
         ],
-        edges: [
+        neighbours: [
           {
             service: 'B',
             innerConnections: [
