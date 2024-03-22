@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { print } from './report.js';
 
 test('print PR comment', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     print('./data/report.json', 'https://github.com/owner/repo', 'sha'),
     `# Inga Report
 

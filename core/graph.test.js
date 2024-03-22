@@ -2,8 +2,8 @@ import assert from 'node:assert';
 import { test } from 'node:test';
 import { create } from './graph.js';
 
-test('create graphs', () => {
-  assert.deepEqual(
+test('create graphs', { only: true }, () => {
+  assert.deepStrictEqual(
     create([
       {
         type: 'entrypoint',
@@ -37,6 +37,7 @@ test('create graphs', () => {
     ]),
     [
       {
+        type: 'entrypoint',
         service: 'A',
         innerConnections: [
           {
@@ -52,15 +53,31 @@ test('create graphs', () => {
         ],
         neighbours: [
           {
-            service: 'B',
+            type: 'connection',
             innerConnections: [
               {
                 entrypoint: {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+                origin: {
                   path: 'b/B.java', name: 'a', line: 1, offset: 1,
                 },
-                origins: [
+              },
+            ],
+            neighbours: [
+              {
+                type: 'entrypoint',
+                service: 'B',
+                innerConnections: [
                   {
-                    path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                    entrypoint: {
+                      path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
                   },
                 ],
               },
@@ -73,7 +90,7 @@ test('create graphs', () => {
 });
 
 test('create multiple graphs', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     create([
       {
         type: 'entrypoint',
@@ -98,6 +115,7 @@ test('create multiple graphs', () => {
     ]),
     [
       {
+        type: 'entrypoint',
         service: 'B',
         innerConnections: [
           {
@@ -113,6 +131,7 @@ test('create multiple graphs', () => {
         ],
       },
       {
+        type: 'entrypoint',
         service: 'A',
         innerConnections: [
           {
@@ -132,7 +151,7 @@ test('create multiple graphs', () => {
 });
 
 test('create graphs with a common parent', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     create([
       {
         type: 'entrypoint',
@@ -195,6 +214,7 @@ test('create graphs with a common parent', () => {
     ]),
     [
       {
+        type: 'entrypoint',
         service: 'A',
         innerConnections: [
           {
@@ -213,30 +233,62 @@ test('create graphs with a common parent', () => {
         ],
         neighbours: [
           {
-            service: 'B',
+            type: 'connection',
             innerConnections: [
               {
                 entrypoint: {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+                origin: {
                   path: 'b/B.java', name: 'a', line: 1, offset: 1,
                 },
-                origins: [
+              },
+            ],
+            neighbours: [
+              {
+                type: 'entrypoint',
+                service: 'B',
+                innerConnections: [
                   {
-                    path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                    entrypoint: {
+                      path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
                   },
                 ],
               },
             ],
           },
           {
-            service: 'C',
+            type: 'connection',
             innerConnections: [
               {
                 entrypoint: {
+                  path: 'a/C.java', name: 'a', line: 1, offset: 1,
+                },
+                origin: {
                   path: 'c/B.java', name: 'a', line: 1, offset: 1,
                 },
-                origins: [
+              },
+            ],
+            neighbours: [
+              {
+                type: 'entrypoint',
+                service: 'C',
+                innerConnections: [
                   {
-                    path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                    entrypoint: {
+                      path: 'c/B.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
                   },
                 ],
               },

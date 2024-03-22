@@ -9,7 +9,7 @@ import {
 } from './sort.js';
 
 test('group by entrypoint', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     getFilePoss([
       {
         entrypoint: {
@@ -117,7 +117,7 @@ test('group by entrypoint', () => {
 });
 
 test('sort with a root file and a file in directories', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     getFilePoss([
       {
         entrypoint: {
@@ -199,7 +199,7 @@ test('sort with a root file and a file in directories', () => {
 });
 
 test('sort with multiple files in a directory', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     getFilePoss([
       {
         entrypoint: {
@@ -274,7 +274,7 @@ test('sort with multiple files in a directory', () => {
 });
 
 test('sort with multiple files in nested directories', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     getFilePoss([
       {
         entrypoint: {
@@ -388,7 +388,7 @@ test('sort with multiple files in nested directories', () => {
 });
 
 test('group by subdirectories', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     groupBySubdirctories([
       ['a', 'b', 'c'],
       ['a', 'b', 'c'],
@@ -404,7 +404,7 @@ test('group by subdirectories', () => {
 
 test('get matching subdirectories length', async (t) => {
   await t.test('with target index', () => {
-    assert.deepEqual(
+    assert.deepStrictEqual(
       getMatchingLength([
         ['a', 'b', 'c'],
         ['a', 'b'],
@@ -415,7 +415,7 @@ test('get matching subdirectories length', async (t) => {
   });
 
   await t.test('with partial match', () => {
-    assert.deepEqual(
+    assert.deepStrictEqual(
       getDuplicateLength(
         ['a', 'b'],
         ['a'],
@@ -425,7 +425,7 @@ test('get matching subdirectories length', async (t) => {
   });
 
   await t.test('with exact match', () => {
-    assert.deepEqual(
+    assert.deepStrictEqual(
       getDuplicateLength(
         ['a', 'b'],
         ['a', 'b'],

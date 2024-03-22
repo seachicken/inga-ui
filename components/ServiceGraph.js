@@ -1,5 +1,6 @@
 import install from '@twind/with-web-components';
 import config from '../twind.config';
+import { getPosKey } from '../core/graph.js';
 
 const withTwind = install(config);
 
@@ -8,13 +9,25 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.innerHTML = `
-      <div id="panel" class="absolute mt-5">
-        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute"></svg>
+      <div id="panel" class="absolute">
+        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-screen h-screen"></svg>
       </div>
 
-      <template id="node-template">
-        <div class="node absolute w-40 rounded border border-black m-3 p-2">
+      <template id="service-template">
+        <div class="service absolute rounded border border-black m-3 p-2">
           <p class="name"></p>
+          <div class="flex">
+            <div class="in">
+            </div>
+            <div class="out">
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template id="file-template">
+        <div class="file rounded border border-black m-3 p-2">
+          <p class="name text-xs"></p>
         </div>
       </template>
 
@@ -25,8 +38,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     this.panel = this.shadowRoot.querySelector('#panel');
     this.edges = this.shadowRoot.querySelector('#edges');
-    this.nodeTemplate = this.shadowRoot.querySelector('#node-template');
+    this.serviceTemplate = this.shadowRoot.querySelector('#service-template');
+    this.fileTemplate = this.shadowRoot.querySelector('#file-template');
     this.edgeTemplate = this.shadowRoot.querySelector('#edge-template');
+    this.files = new Map();
   }
 
   static get observedAttributes() {
@@ -42,33 +57,80 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
   render() {
     for (let i = 0; i < this.graphs.length; i += 1) {
-      const graph = this.graphs[i];
-      this.renderGraph(graph, i);
+      this.renderGraph(this.graphs[i], i);
+    }
+    requestAnimationFrame(() => {
+      this.renderEdges(this.graphs, this.files);
+    });
+  }
+
+  renderGraph(graph, i, depth = 0) {
+    const serviceRoot = document.importNode(this.serviceTemplate.content, true);
+    const service = serviceRoot.querySelector('.service');
+    service.style.left = `${depth * 400}px`;
+    service.style.top = `${i * 150}px`;
+    service.querySelector('.name').innerHTML = graph.service;
+    this.panel.appendChild(service);
+
+    for (let ci = 0; ci < graph.innerConnections.length; ci += 1) {
+      this.renderFile(graph.innerConnections[ci], 0, 0, service);
+    }
+
+    (graph.neighbours || [])
+      .forEach((c, ci) => c.neighbours.forEach((s) => this.renderGraph(s, ci, depth + 1)));
+  }
+
+  renderFile(conn, i, depth, service) {
+    const fileRoot = document.importNode(this.fileTemplate.content, true);
+    const file = fileRoot.querySelector('.file');
+    file.style.left = `${depth * 200}px`;
+    file.style.top = `${i * 30}px`;
+    if (conn.entrypoint) {
+      file.querySelector('.name').innerHTML = conn.entrypoint.path.split('/').pop();
+      service.querySelector('.in').appendChild(file);
+      this.files.set(getPosKey(conn.entrypoint), file);
+
+      conn.origins.forEach((o, oi) => this.renderFile(o, oi, depth + 1, service));
+    } else {
+      file.querySelector('.name').innerHTML = conn.path.split('/').pop();
+      service.querySelector('.out').appendChild(file);
+      this.files.set(getPosKey(conn), file);
     }
   }
 
-  renderGraph(graph, i, depth = 0, parent = null) {
-    const nodeRoot = document.importNode(this.nodeTemplate.content, true);
-    const node = nodeRoot.querySelector('.node');
-    node.style.left = `${depth * 200}px`;
-    node.style.top = `${i * 70}px`;
-    node.querySelector('.name').innerHTML = graph.service;
-    this.panel.appendChild(node);
-    if (parent) {
-      requestAnimationFrame(() => {
-        const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        const panelRect = this.panel.getBoundingClientRect();
-        const nodeRect = node.getBoundingClientRect();
-        const parentRect = parent.getBoundingClientRect();
-        edge.setAttribute('x1', parentRect.right - panelRect.left);
-        edge.setAttribute('y1', parentRect.top + (parentRect.height / 2) - panelRect.top);
-        edge.setAttribute('x2', nodeRect.left - panelRect.left);
-        edge.setAttribute('y2', nodeRect.top + (nodeRect.height / 2) - panelRect.top);
-        edge.setAttribute('stroke', 'black');
-        this.edges.appendChild(edge);
-      });
-    }
+  renderEdges(graphs, files) {
+    for (const graph of graphs) {
+      for (const innerConn of graph.innerConnections) {
+        for (const origin of innerConn.origins) {
+          this.renderEdge(
+            files.get(getPosKey(innerConn.entrypoint)),
+            files.get(getPosKey(origin)),
+          );
+        }
+      }
 
-    (graph.neighbours || []).forEach((n, ni) => this.renderGraph(n, ni, depth + 1, node));
+      for (const connection of graph.neighbours || []) {
+        for (const conn of connection.innerConnections) {
+          this.renderEdge(
+            files.get(getPosKey(conn.entrypoint)),
+            files.get(getPosKey(conn.origin)),
+          );
+        }
+        this.renderEdges(connection.neighbours, files);
+      }
+    }
+  }
+
+  renderEdge(dom1, dom2) {
+    const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const panelRect = this.panel.getBoundingClientRect();
+    const dom1Rect = dom1.getBoundingClientRect();
+    const dom2Rect = dom2.getBoundingClientRect();
+    edge.setAttribute('x1', dom1Rect.right - panelRect.left);
+    edge.setAttribute('y1', dom1Rect.top + (dom2Rect.height / 2) - panelRect.top);
+    edge.setAttribute('x2', dom2Rect.left - panelRect.left);
+    edge.setAttribute('y2', dom2Rect.top + (dom1Rect.height / 2) - panelRect.top);
+    edge.setAttribute('stroke', 'lightblue');
+    this.edges.appendChild(edge);
   }
 }

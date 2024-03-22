@@ -4,10 +4,10 @@ export function create(reportedPoss) {
     if (pos.type !== 'connection') {
       continue;
     }
-    if (entrypointConnections.has(getKey(pos.entrypoint))) {
-      entrypointConnections.get(getKey(pos.entrypoint)).push(pos);
+    if (entrypointConnections.has(getPosKey(pos.entrypoint))) {
+      entrypointConnections.get(getPosKey(pos.entrypoint)).push(pos);
     } else {
-      entrypointConnections.set(getKey(pos.entrypoint), [pos]);
+      entrypointConnections.set(getPosKey(pos.entrypoint), [pos]);
     }
   }
 
@@ -16,10 +16,10 @@ export function create(reportedPoss) {
     if (pos.type !== 'connection') {
       continue;
     }
-    if (originConnections.has(getKey(pos.origin))) {
-      originConnections.get(getKey(pos.origin)).push(pos);
+    if (originConnections.has(getPosKey(pos.origin))) {
+      originConnections.get(getPosKey(pos.origin)).push(pos);
     } else {
-      originConnections.set(getKey(pos.origin), [pos]);
+      originConnections.set(getPosKey(pos.origin), [pos]);
     }
   }
 
@@ -31,23 +31,27 @@ export function create(reportedPoss) {
     if (services.has(pos.service)) {
       services.get(pos.service).poss.push(pos);
     } else {
-      services.set(pos.service, { name: pos.service, poss: [pos] });
+      services.set(pos.service, { type: pos.type, name: pos.service, poss: [pos] });
     }
   }
 
   for (const service of Array.from(services.values())) {
     const originConns = service.poss
-      .flatMap((pos) => entrypointConnections.get(getKey(pos.origin)) || []);
-    if (originConns) {
-      for (const originConn of originConns) {
-        const neighbours = Array.from(services.values())
-          .filter((s) => s.poss
-            .find((pos) => getKey(pos.entrypoint) === getKey(originConn.origin)));
-        if (service.neighbours) {
-          service.neighbours.push(...neighbours);
-        } else {
-          service.neighbours = neighbours;
-        }
+      .flatMap((pos) => entrypointConnections.get(getPosKey(pos.origin)) || []);
+    for (const originConn of originConns) {
+      if (service.neighbours) {
+        service.neighbours.push(originConn);
+      } else {
+        service.neighbours = [originConn];
+      }
+
+      const neighbourServices = Array.from(services.values())
+        .filter((s) => s.poss
+          .find((pos) => getPosKey(pos.entrypoint) === getPosKey(originConn.origin)));
+      if (originConn.neighbours) {
+        originConn.neighbours.push(...neighbourServices);
+      } else {
+        originConn.neighbours = neighbourServices;
       }
     }
   }
@@ -58,7 +62,7 @@ export function create(reportedPoss) {
 function findHeadServiecs(services, originConnections) {
   const heads = [];
   for (const service of Array.from(services.values())) {
-    if (service.poss.find((pos) => !originConnections.has(getKey(pos.entrypoint)))) {
+    if (service.poss.find((pos) => !originConnections.has(getPosKey(pos.entrypoint)))) {
       heads.push(service);
     }
   }
@@ -67,22 +71,32 @@ function findHeadServiecs(services, originConnections) {
 
 function toNode(service) {
   const result = {
-    service: service.name,
-    innerConnections: groupByEntrypoint(service.poss),
+    type: service.type,
+    innerConnections: groupByEntrypoint(service),
   };
+  if (service.name) {
+    result.service = service.name;
+  }
   if (service.neighbours) {
     result.neighbours = service.neighbours.map((s) => toNode(s));
   }
   return result;
 }
 
-function groupByEntrypoint(poss) {
+function groupByEntrypoint(service) {
+  if (service.type === 'connection') {
+    return [{
+      entrypoint: service.entrypoint,
+      origin: service.origin,
+    }];
+  }
+
   const entrypoints = new Map();
-  for (const pos of poss) {
-    if (entrypoints.has(getKey(pos.entrypoint))) {
-      entrypoints.get(getKey(pos.entrypoint)).push(pos);
+  for (const pos of service.poss) {
+    if (entrypoints.has(getPosKey(pos.entrypoint))) {
+      entrypoints.get(getPosKey(pos.entrypoint)).push(pos);
     } else {
-      entrypoints.set(getKey(pos.entrypoint), [pos]);
+      entrypoints.set(getPosKey(pos.entrypoint), [pos]);
     }
   }
   return Array.from(entrypoints.values()).map((eposs) => ({
@@ -91,6 +105,6 @@ function groupByEntrypoint(poss) {
   }));
 }
 
-function getKey(reportedPos) {
-  return `${reportedPos.path}-${reportedPos.name}-${reportedPos.line}-${reportedPos.offset}`;
+export function getPosKey(pos) {
+  return `${pos.path}-${pos.name}-${pos.line}-${pos.offset}`;
 }
