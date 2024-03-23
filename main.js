@@ -3,11 +3,11 @@ import config from './twind.config';
 import FileTree from './components/FileTree.js';
 import ServiceGraph from './components/ServiceGraph.js';
 import TreeItem from './components/TreeItem.js';
+import { create, getPosKey } from './core/graph.js';
 import {
   fileType,
   getFilePoss,
 } from './core/sort.js';
-import { create } from './core/graph.js';
 
 install(config);
 
@@ -44,20 +44,13 @@ document.querySelector('#app').innerHTML = `
 const entrypointNav = document.querySelector('#entrypoint-nav');
 const entrypointTreeView = document.querySelector('#entrypoint-tree');
 const separator = document.querySelector('#separator');
+const serviceGraph = document.querySelector('#service-graph');
 
 entrypointTreeView.addEventListener('itemselect', (e) => {
-  const selectedEntoryDec = entrypointTree[e.detail.fileIndex]
-    .declarations[e.detail.declarationIndex];
-  const relatedPoss = [];
-  for (const entoryOrigin of selectedEntoryDec.origins) {
-    for (const originDec of entoryOrigin.declarations) {
-      const found = report
-        .find((pos) => pos.origin.path === originDec.path && pos.origin.name === originDec.name);
-      if (found) {
-        relatedPoss.push(found);
-      }
-    }
-  }
+  serviceGraph.setAttribute(
+    'entrypointselect',
+    getPosKey(entrypointTree[e.detail.fileIndex].declarations[e.detail.declarationIndex]),
+  );
 });
 
 function risizeSeperator(e) {

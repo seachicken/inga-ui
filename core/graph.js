@@ -56,17 +56,34 @@ export function create(reportedPoss) {
     }
   }
 
-  return findHeadServiecs(services, originConnections).map((s) => toNode(s));
+  return findRootServiecs(services, originConnections).map((s) => toNode(s));
 }
 
-function findHeadServiecs(services, originConnections) {
-  const heads = [];
+export function findLeafPoss(graphs) {
+  const results = [];
+  const q = [];
+  q.push(...graphs);
+
+  while (q.length > 0) {
+    const graph = q.shift();
+    if (graph.type === 'entrypoint' && !graph.neighbours) {
+      results.push(...graph.innerConnections.flatMap((c) => c.origins));
+    }
+
+    q.push(...graph.neighbours || []);
+  }
+
+  return results;
+}
+
+function findRootServiecs(services, originConnections) {
+  const results = [];
   for (const service of Array.from(services.values())) {
     if (service.poss.find((pos) => !originConnections.has(getPosKey(pos.entrypoint)))) {
-      heads.push(service);
+      results.push(service);
     }
   }
-  return heads;
+  return results;
 }
 
 function toNode(service) {
@@ -106,5 +123,8 @@ function groupByEntrypoint(service) {
 }
 
 export function getPosKey(pos) {
+  if (!pos) {
+    return null;
+  }
   return `${pos.path}-${pos.name}-${pos.line}-${pos.offset}`;
 }

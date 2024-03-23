@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { test } from 'node:test';
-import { create } from './graph.js';
+import { create, findLeafPoss } from './graph.js';
 
-test('create graphs', { only: true }, () => {
+test('create graphs', () => {
   assert.deepStrictEqual(
     create([
       {
@@ -295,6 +295,47 @@ test('create graphs with a common parent', () => {
             ],
           },
         ],
+      },
+    ],
+  );
+});
+
+test('filter by files changed', { only: true }, () => {
+  assert.deepStrictEqual(
+    findLeafPoss(create([
+      {
+        type: 'entrypoint',
+        service: 'B',
+        entrypoint: {
+          path: 'b/B.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+      {
+        type: 'connection',
+        entrypoint: {
+          path: 'a/B.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/B.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+      {
+        type: 'entrypoint',
+        service: 'A',
+        entrypoint: {
+          path: 'a/A.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'a/B.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+    ])),
+    [
+      {
+        path: 'b/A.java', name: 'a', line: 1, offset: 1,
       },
     ],
   );
