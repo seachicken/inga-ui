@@ -23,9 +23,9 @@ const graphs = create(report);
 const selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
 document.querySelector('#app').innerHTML = `
-  <header class="flex items-center w-full p-2 text-2xl bg-green">
+  <header class="flex items-center w-full p-2 bg-green">
     <img class="w-10" src="logo.png">
-    <span class="ml-2 text-white">Inga</span>
+    <span class="ml-2 text-white text-xl">Inga</span>
   </header>
   <div class="flex h-screen">
     <div id="entrypoint-nav" class="overflow-y-auto w-72">
@@ -49,7 +49,10 @@ const serviceGraph = document.querySelector('#service-graph');
 entrypointTreeView.addEventListener('itemselect', (e) => {
   serviceGraph.setAttribute(
     'entrypointselect',
-    getPosKey(entrypointTree[e.detail.fileIndex].declarations[e.detail.declarationIndex]),
+    JSON.stringify({
+      state: e.detail.state,
+      posKey: getPosKey(entrypointTree[e.detail.fileIndex].declarations[e.detail.declarationIndex]),
+    }),
   );
 });
 

@@ -1,6 +1,7 @@
 import install from '@twind/with-web-components';
 import config from '../twind.config';
 import { fileType } from '../core/sort.js';
+import { itemSelectState } from './TreeItem.js';
 
 const withTwind = install(config);
 
@@ -115,15 +116,25 @@ export default class FileTree extends withTwind(HTMLElement) {
             .importNode(this.declarationItemTemplate.content, true);
           const decItem = declarationItemRoot.querySelector('.declaration-item');
           decItem.nest = pos.nest + 1;
+          decItem.activable = true;
           decItem.querySelector('.name').innerHTML = declaration.name;
           decItem.querySelector('.link').href = `${this.repoUrl}/blob/${this.headSha}/${declaration.path}#L${declaration.line}`;
-          decItem.addEventListener('mouseover', () => {
+          decItem.onStateChanged = (state) => {
+            if (this.prevSelectItem?.active && state !== itemSelectState.SELECT) {
+              return;
+            }
+            if (state === itemSelectState.SELECT) {
+              if (this.prevSelectItem && decItem !== this.prevSelectItem) {
+                this.prevSelectItem.active = false;
+              }
+              this.prevSelectItem = decItem;
+            }
             this.dispatchEvent(new CustomEvent('itemselect', {
               bubbles: true,
               composed: true,
-              detail: { fileIndex: fi, declarationIndex: di },
+              detail: { state, fileIndex: fi, declarationIndex: di },
             }));
-          });
+          };
           fileItem.appendChild(decItem);
         }
       }
