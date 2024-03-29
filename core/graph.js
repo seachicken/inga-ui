@@ -79,7 +79,7 @@ export function findLeafPoss(graphs) {
 function findRootServiecs(services, originConnections) {
   const results = [];
   for (const service of Array.from(services.values())) {
-    if (service.poss.find((pos) => !originConnections.has(getPosKey(pos.entrypoint)))) {
+    if (service.poss.every((pos) => !originConnections.has(getPosKey(pos.entrypoint)))) {
       results.push(service);
     }
   }

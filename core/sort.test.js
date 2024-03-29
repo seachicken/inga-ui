@@ -387,6 +387,51 @@ test('sort with multiple files in nested directories', () => {
   );
 });
 
+test('group by entrypoint with only entrypoint', () => {
+  assert.deepStrictEqual(
+    getFilePoss([
+      {
+        entrypoint: {
+          path: 'a/A.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+      {
+        entrypoint: {
+          path: 'a/A.java', name: 'b', line: 2, offset: 1,
+        },
+      },
+    ]),
+    [
+      {
+        type: fileType.DIR,
+        nest: 0,
+        path: 'a',
+      },
+      {
+        type: fileType.FILE,
+        nest: 1,
+        path: 'A.java',
+        declarations: [
+          {
+            path: 'a/A.java',
+            name: 'a',
+            line: 1,
+            offset: 1,
+            origins: [],
+          },
+          {
+            path: 'a/A.java',
+            name: 'b',
+            line: 2,
+            offset: 1,
+            origins: [],
+          },
+        ],
+      },
+    ],
+  );
+});
+
 test('group by subdirectories', () => {
   assert.deepStrictEqual(
     groupBySubdirctories([

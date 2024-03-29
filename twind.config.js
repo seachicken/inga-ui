@@ -1,4 +1,4 @@
-import { apply, css, defineConfig } from '@twind/core';
+import { defineConfig } from '@twind/core';
 import presetAutoprefix from '@twind/preset-autoprefix';
 import presetTailwind from '@twind/preset-tailwind';
 import * as colors from 'twind/colors';

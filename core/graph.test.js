@@ -300,7 +300,114 @@ test('create graphs with a common parent', () => {
   );
 });
 
-test('filter by files changed', { only: true }, () => {
+test('create graphs with related and orphan declarations', { only: true }, () => {
+  assert.deepStrictEqual(
+    create([
+      {
+        type: 'entrypoint',
+        service: 'B',
+        entrypoint: {
+          path: 'b/B.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+      {
+        type: 'connection',
+        entrypoint: {
+          path: 'a/B.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/B.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+      {
+        type: 'entrypoint',
+        service: 'A',
+        entrypoint: {
+          path: 'a/A.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'a/B.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+      {
+        type: 'entrypoint',
+        service: 'B',
+        entrypoint: {
+          path: 'b/D.java', name: 'a', line: 1, offset: 1,
+        },
+        origin: {
+          path: 'b/C.java', name: 'a', line: 1, offset: 1,
+        },
+      },
+    ]),
+    [
+      {
+        type: 'entrypoint',
+        service: 'A',
+        innerConnections: [
+          {
+            entrypoint: {
+              path: 'a/A.java', name: 'a', line: 1, offset: 1,
+            },
+            origins: [
+              {
+                path: 'a/B.java', name: 'a', line: 1, offset: 1,
+              },
+            ],
+          },
+        ],
+        neighbours: [
+          {
+            type: 'connection',
+            innerConnections: [
+              {
+                entrypoint: {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+                origin: {
+                  path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                },
+              },
+            ],
+            neighbours: [
+              {
+                type: 'entrypoint',
+                service: 'B',
+                innerConnections: [
+                  {
+                    entrypoint: {
+                      path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
+                  },
+                  {
+                    entrypoint: {
+                      path: 'b/D.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'b/C.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  );
+});
+
+test('filter by files changed', () => {
   assert.deepStrictEqual(
     findLeafPoss(create([
       {

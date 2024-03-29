@@ -155,7 +155,7 @@ function groupByKey(poss, key) {
           {
             ...target,
             paths,
-            origins: [pos.origin],
+            origins: pos.origin ? [pos.origin] : [],
           },
         );
       }
@@ -167,7 +167,7 @@ function groupByKey(poss, key) {
           {
             ...target,
             paths,
-            origins: [pos.origin],
+            origins: pos.origin ? [pos.origin] : [],
           },
         ],
       });
