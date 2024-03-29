@@ -79,6 +79,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.fileTemplate = this.shadowRoot.querySelector('#file-template');
     this.declarationTemplate = this.shadowRoot.querySelector('#declaration-template');
     this.declarations = new Map();
+    this.selectEntrypointState = itemSelectState.NORMAL;
   }
 
   static get observedAttributes() {
@@ -175,20 +176,28 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
   }
 
-  renderEdges(graphs, declarations, selectedParent = false) {
+  renderEdges(graphs, declarations, parentKey = null) {
     for (const graph of graphs) {
-      let selected = selectedParent;
+      let selected = false;
+      const parentKeys = [];
       for (const innerConn of graph.innerConnections) {
-        if (!selectedParent) {
+        if (parentKey) {
+          selected = this.selectEntrypointState !== itemSelectState.NORMAL
+            && parentKey === getPosKey(innerConn.entrypoint);
+        } else {
           selected = this.selectEntrypointState !== itemSelectState.NORMAL
             && this.selectEntrypoint === getPosKey(innerConn.entrypoint);
         }
+
         for (const origin of innerConn.origins) {
           this.renderEdge(
             declarations.get(getPosKey(innerConn.entrypoint)),
             declarations.get(getPosKey(origin)),
             selected,
           );
+          if (getPosKey(innerConn.entrypoint) === this.selectEntrypoint) {
+            parentKeys.push(getPosKey(origin));
+          }
           if (selected && this.filesChangedPoss
             .find((p) => getPosKey(p) === getPosKey(origin))) {
             if (this.selectEntrypointState === itemSelectState.OVER) {
@@ -201,14 +210,24 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       }
 
       for (const connection of graph.neighbours || []) {
+        let newParentKey = null;
         for (const conn of connection.innerConnections) {
           this.renderEdge(
             declarations.get(getPosKey(conn.entrypoint)),
             declarations.get(getPosKey(conn.origin)),
             selected,
           );
+
+          if (parentKeys.find((k) => k === getPosKey(conn.entrypoint))) {
+            newParentKey = getPosKey(conn.origin);
+          }
         }
-        this.renderEdges(connection.neighbours, declarations, selected);
+
+        this.renderEdges(
+          connection.neighbours,
+          declarations,
+          newParentKey,
+        );
       }
     }
   }
