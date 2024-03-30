@@ -23,7 +23,7 @@ const graphs = create(report);
 const selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
 document.querySelector('#app').innerHTML = `
-  <header class="flex items-center w-full p-1 shadow">
+  <header class="flex items-center w-full p-1 border shadow">
     <img class="w-10" src="logo.png">
   </header>
   <div class="flex h-screen">
