@@ -23,9 +23,8 @@ const graphs = create(report);
 const selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
 document.querySelector('#app').innerHTML = `
-  <header class="flex items-center w-full p-2 bg-green">
+  <header class="flex items-center w-full p-1 shadow">
     <img class="w-10" src="logo.png">
-    <span class="ml-2 text-white text-xl">Inga</span>
   </header>
   <div class="flex h-screen">
     <div id="entrypoint-nav" class="overflow-y-auto w-72">
@@ -37,7 +36,7 @@ document.querySelector('#app').innerHTML = `
       </div>
     </div>
     <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-    <service-graph id="service-graph" class="w-full" src=${JSON.stringify(graphs)}></service-graph>
+    <service-graph id="service-graph" class="w-full bg-gray-100" src=${JSON.stringify(graphs)}></service-graph>
   </div>
 `;
 

@@ -9,7 +9,7 @@ const withTwind = install(config);
 const sheet = cssomSheet({ target: new CSSStyleSheet() });
 sheet.target.replaceSync(`
   .file {
-    outline: solid 1px ${tw.theme('colors.gray.500')};
+    background-color: ${tw.theme('colors.white')};
   }
   .file-hover {
     background-color: ${tw.theme('colors.gray.100')};
@@ -43,8 +43,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="service-template">
-        <div class="service absolute rounded border border-black m-3 p-2">
-          <p class="name"></p>
+        <div class="service absolute rounded border-1 border-green m-3 p-2">
+          <p class="name text-gray-700"></p>
           <div class="flex">
             <div class="in">
             </div>
@@ -55,20 +55,20 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="file-template">
-        <div class="file rounded m-3 py-1">
-          <div class="flex px-2 items-center">
-            <div class="changed-icon hidden mr-1">
+        <div class="file rounded drop-shadow m-3 py-1">
+          <div class="flex mb-1 px-2 items-center">
+            <div class="changed-icon hidden fill-green mr-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M1 1.75C1 .784 1.784 0 2.75 0h7.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V4.664a.25.25 0 0 0-.073-.177l-2.914-2.914a.25.25 0 0 0-.177-.073ZM8 3.25a.75.75 0 0 1 .75.75v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5a.75.75 0 0 1-1.5 0V7h-1.5a.75.75 0 0 1 0-1.5h1.5V4A.75.75 0 0 1 8 3.25Zm-3 8a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"></path></svg>
             </div>
             <p class="name"></p>
           </div>
-          <ul class="declarations"></ul>
+          <ul class="declarations divide-y"></ul>
         </div>
       </template>
 
       <template id="declaration-template">
         <li class="declaration">
-          <p class="name text-sm px-2"></p>
+          <p class="name text-gray-700 text-sm px-2"></p>
         </li>
       </template>
     `;

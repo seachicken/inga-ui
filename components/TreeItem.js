@@ -11,6 +11,10 @@ sheet.target.replaceSync(`
   .active {
     background-color: ${tw.theme('colors.blue.100')};
   }
+  .declaration-name {
+    font-size: 0.875rem;
+    color: ${tw.theme('colors.gray.700')};
+  }
 `);
 
 export const itemSelectState = {
@@ -29,7 +33,7 @@ export default class TreeItem extends withTwind(HTMLElement) {
         <div id="item" class="w-full py-1 rounded-lg">
           <div id="head" class="flex items-center">
             <div id="expand-icon" class="px-1 invisible"></div>
-            <slot name="icon"></slot>
+            <slot name="icon" class="fill-green"></slot>
             <slot name="body"></slot>
           </div>
         </div>
