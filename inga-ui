@@ -8,12 +8,12 @@ if ! type -p gh >/dev/null; then
   exit 1
 fi
 
+cat - > $HOME_DIR/report.json
+
 GITHUB_URL=$(gh repo view --json url --jq .url)
 echo "GITHUB_URL: $GITHUB_URL"
 HEAD_SHA=$(gh pr view --json headRefOid --jq .headRefOid)
 echo "HEAD_SHA: $HEAD_SHA"
-
-cat - > $HOME_DIR/report.json
 
 if [ $1 = "pr-report" ]; then
   PR_COMMENT=$(cd $HOME_DIR && npm run --silent print-pr \
