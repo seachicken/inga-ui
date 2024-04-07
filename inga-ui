@@ -26,7 +26,7 @@ elif [ $1 = "html-report" ]; then
     --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} -- --base=${BASE})
   OUTPUT_DIR=inga-report-$(gh pr view --json number --jq .number)
   mkdir -p reports/$OUTPUT_DIR
-  cp -r $HOME_DIR/reports/ ./reports/$OUTPUT_DIR
+  cp -rT $HOME_DIR/reports ./reports/$OUTPUT_DIR
 else
   echo "command is required" >&2
   exit 1
