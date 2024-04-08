@@ -1,7 +1,8 @@
 #!/bin/bash
 
 COMMAND=$1
-HOME_DIR="${2-/inga-ui}"
+BASE=$2
+HOME_DIR="${3-/inga-ui}"
 
 if ! type -p gh >/dev/null; then
   echo "gh not found on the system" >&2
@@ -22,7 +23,8 @@ if [ $1 = "pr-report" ]; then
   gh pr comment --body "$PR_COMMENT" --edit-last || gh pr comment --body "$PR_COMMENT"
 elif [ $1 = "html-report" ]; then
   (cd $HOME_DIR && npm run build \
-    --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} -- --base=${GITHUB_URL})
+    --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} -- --base=${BASE})
+  cp -r $HOME_DIR/inga-report .
 else
   echo "command is required" >&2
   exit 1
