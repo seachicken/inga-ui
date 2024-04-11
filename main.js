@@ -18,6 +18,7 @@ window.customElements.define('tree-item', TreeItem);
 const report = window.inga_report;
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
+const prNumber = window.inga_pr_number;
 const entrypointTree = getFilePoss(report.filter((p) => p.type === 'entrypoint'));
 const graphs = create(report);
 const selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
@@ -36,7 +37,7 @@ document.querySelector('#app').innerHTML = `
       </div>
     </div>
     <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-    <service-graph id="service-graph" class="w-full bg-gray-100" src=${JSON.stringify(graphs)}></service-graph>
+    <service-graph id="service-graph" class="w-full bg-gray-100" src=${JSON.stringify(graphs)} repourl=${repoUrl} prnumber=${prNumber}></service-graph>
   </div>
 `;
 

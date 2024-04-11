@@ -13,8 +13,11 @@ cat - > $HOME_DIR/report.json
 
 GITHUB_URL=$(gh repo view --json url --jq .url)
 echo "GITHUB_URL: $GITHUB_URL"
-HEAD_SHA=$(gh pr view --json headRefOid --jq .headRefOid)
+PR_JSON=$(gh pr view --json headRefOid,number)
+HEAD_SHA=$(echo $PR_JSON | jq .headRefOid)
 echo "HEAD_SHA: $HEAD_SHA"
+PR_NUMBER=$(echo $PR_JSON | jq .number)
+echo "PR_NUMBER: $PR_NUMBER"
 
 if [ $1 = "pr-report" ]; then
   PR_COMMENT=$(cd $HOME_DIR && npm run --silent print-pr \
@@ -23,7 +26,8 @@ if [ $1 = "pr-report" ]; then
   gh pr comment --body "$PR_COMMENT" --edit-last || gh pr comment --body "$PR_COMMENT"
 elif [ $1 = "html-report" ]; then
   (cd $HOME_DIR && npm run build \
-    --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} -- --base=${BASE})
+    --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} \
+    --inganumber=${PR_NUMBER} -- --base=${BASE})
   cp -r $HOME_DIR/inga-report .
 else
   echo "command is required" >&2

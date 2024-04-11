@@ -57,7 +57,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       <template id="file-template">
         <div class="file rounded drop-shadow m-3 py-1">
           <div class="flex mb-1 px-2 items-center">
-            <div class="changed-icon hidden fill-green mr-1">
+            <div class="changed-icon fill-green mr-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M1 1.75C1 .784 1.784 0 2.75 0h7.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V4.664a.25.25 0 0 0-.073-.177l-2.914-2.914a.25.25 0 0 0-.177-.073ZM8 3.25a.75.75 0 0 1 .75.75v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5a.75.75 0 0 1-1.5 0V7h-1.5a.75.75 0 0 1 0-1.5h1.5V4A.75.75 0 0 1 8 3.25Zm-3 8a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"></path></svg>
             </div>
             <p class="name"></p>
@@ -67,8 +67,11 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="declaration-template">
-        <li class="declaration">
+        <li class="declaration flex items-center">
           <p class="name text-gray-700 text-sm px-2"></p>
+          <a target="_blank" class="link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path></svg>
+          </a>
         </li>
       </template>
     `;
@@ -83,14 +86,21 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   static get observedAttributes() {
-    return ['src', 'entrypointselect'];
+    return ['src', 'repourl', 'prnumber', 'entrypointselect'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'src') {
       this.graphs = JSON.parse(newValue);
       this.filesChangedPoss = findLeafPoss(this.graphs);
-
+      this.render();
+    }
+    if (name === 'repourl') {
+      this.repoUrl = newValue;
+      this.render();
+    }
+    if (name === 'prnumber') {
+      this.prNumber = newValue;
       this.render();
     }
     if (name === 'entrypointselect') {
@@ -159,9 +169,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     file.style.top = `${i * 30}px`;
     file.querySelector('.name').innerHTML = pos.path.split('/').pop();
 
-    if (pos.declarations
-      .find((d) => this.filesChangedPoss.find((p) => getPosKey(p) === getPosKey(d)))) {
-      file.querySelector('.changed-icon').classList.remove('hidden');
+    const fileChanged = pos.declarations
+      .find((d) => this.filesChangedPoss.find((p) => getPosKey(p) === getPosKey(d)));
+    if (!fileChanged) {
+      file.querySelector('.changed-icon').classList.add('hidden');
     }
 
     parent.appendChild(file);
@@ -170,6 +181,13 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       const declarationRoot = document.importNode(this.declarationTemplate.content, true);
       const declaration = declarationRoot.querySelector('.declaration');
       declaration.querySelector('.name').innerHTML = dec.name;
+      if (fileChanged) {
+        toSha256(dec.path).then((sha) => {
+          declaration.querySelector('.link').href = `${this.repoUrl}/pull/${this.prNumber}/files#diff-${sha}R${dec.line}`;
+        });
+      } else {
+        declaration.querySelector('.link').classList.add('hidden');
+      }
       file.querySelector('.declarations').appendChild(declaration);
 
       this.declarations.set(getPosKey(dec), declaration);
@@ -249,4 +267,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     edge.setAttribute('stroke-width', selected ? '3' : '2');
     this.edges.appendChild(edge);
   }
+}
+
+async function toSha256(str) {
+  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  const hashArray = Array.from(new Uint8Array(buffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
