@@ -17,6 +17,9 @@ sheet.target.replaceSync(`
   .file-select {
     background-color: ${tw.theme('colors.blue.100')};
   }
+  .file-changed {
+    background-color: ${tw.theme('colors.green.50')};
+  }
 
   .edge-select {
     stroke-dasharray: 8;
@@ -171,7 +174,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     const fileChanged = pos.declarations
       .find((d) => this.filesChangedPoss.find((p) => getPosKey(p) === getPosKey(d)));
-    if (!fileChanged) {
+    if (fileChanged) {
+      file.classList.add('file-changed');
+    } else {
       file.querySelector('.changed-icon').classList.add('hidden');
     }
 
