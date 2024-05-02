@@ -7,4 +7,7 @@ export default defineConfig({
       input: 'index.html',
     },
   },
+  server: {
+    host: true,
+  },
 });

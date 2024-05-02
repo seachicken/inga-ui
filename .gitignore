@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 /index.html
-/reports
+/inga-report
 
 # Editor directories and files
 .vscode/*
