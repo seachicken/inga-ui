@@ -23,6 +23,14 @@ let entrypointTree = [];
 let graphs = [];
 let selectedFileIndex = 0;
 
+async function loadReport() {
+  const response = await fetch('report.json');
+  if (!response.ok) {
+    return [];
+  }
+  return response.json();
+}
+
 function reload(poss) {
   entrypointTree = getFilePoss(poss.filter((p) => p.type === 'entrypoint'));
   graphs = create(poss);
@@ -85,14 +93,15 @@ function reload(poss) {
   });
 }
 
-reload(report);
+(async () => {
+  if (report.length === 0) {
+    report = await loadReport();
+  }
+  reload(report);
+})();
 
 setInterval(async () => {
-  const response = await fetch('report.json');
-  if (!response.ok) {
-    return;
-  }
-  const json = await response.json();
+  const json = await loadReport();
   if (JSON.stringify(report) !== JSON.stringify(json)) {
     report = json;
     document.querySelector('#refresh-button').classList.remove('hidden');
