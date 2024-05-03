@@ -37,7 +37,7 @@ function reload(poss) {
   selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
   document.querySelector('#app').innerHTML = `
-    <header class="flex items-center w-full p-1 border shadow">
+    <header class="flex items-center w-full p-1 bg-white border shadow">
       <img class="w-10" src="logo.png">
       <button id="refresh-button" class="flex items-center fixed z-10 inset-x-0 max-w-max mx-auto bg-blue-500 text-white rounded-full px-3 py-1 hidden">
         <div class="fill-white mr-1">
@@ -46,7 +46,7 @@ function reload(poss) {
         Refresh
       </button>
     </header>
-    <div class="flex h-screen">
+    <div class="flex h-screen bg-white">
       <div id="entrypoint-nav" class="overflow-y-auto w-72">
         <div class="flex items-center w-full">
           <span class="m-2 text-ms text-gray-500">Impacted entrypoints</span>
