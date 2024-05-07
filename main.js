@@ -106,4 +106,4 @@ setInterval(async () => {
     report = json;
     document.querySelector('#refresh-button').classList.remove('hidden');
   }
-}, 10000);
+}, 5000);
