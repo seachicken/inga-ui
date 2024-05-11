@@ -111,7 +111,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       this.selectEntrypointState = obj.state;
       this.selectEntrypoint = obj.posKey;
 
-      this.declarations.values().forEach((f) => f.classList.remove('file-hover', 'file-select'));
+      for (const file of this.declarations.values()) {
+        file.classList.remove('file-hover', 'file-select');
+      }
       switch (this.selectEntrypointState) {
         case itemSelectState.OVER:
           this.declarations.get(this.selectEntrypoint).classList.add('file-hover');
