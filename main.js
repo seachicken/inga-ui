@@ -19,6 +19,7 @@ const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
 let report = window.inga_report;
+let reportHash;
 let entrypointTree = [];
 let graphs = [];
 let selectedFileIndex = 0;
@@ -90,16 +91,26 @@ function reload(poss) {
   });
 }
 
+async function digest(msg) {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 (async () => {
   if (report.length === 0) {
     report = await loadReport();
   }
+  reportHash = await digest(report);
   reload(report);
 })();
 
 setInterval(async () => {
   const json = await loadReport();
-  if (JSON.stringify(report) !== JSON.stringify(json)) {
+  const hash = await digest(json);
+  if (hash !== reportHash) {
+    reportHash = hash;
     report = json;
     document.querySelector('#refresh-button').classList.remove('hidden');
   }
