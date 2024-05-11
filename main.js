@@ -37,9 +37,9 @@ function reload(poss) {
   selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
   document.querySelector('#app').innerHTML = `
-    <div class="flex h-screen bg-white">
-      <div id="entrypoint-nav" class="overflow-y-auto w-72">
-        <div class="flex items-center w-full">
+    <div class="flex h-screen bg-gray-100">
+      <div id="entrypoint-nav" class="overflow-y-auto w-72 bg-white">
+        <div class="flex items-center">
           <span class="m-2 text-ms text-gray-500">Impacted entrypoints</span>
         </div>
         <div class="ml-2">
@@ -47,7 +47,7 @@ function reload(poss) {
         </div>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="w-full bg-gray-100" src=${JSON.stringify(graphs)} repourl=${repoUrl} prnumber=${prNumber}></service-graph>
+      <service-graph id="service-graph" src=${JSON.stringify(graphs)} repourl=${repoUrl} prnumber=${prNumber}></service-graph>
     </div>
   `;
 
