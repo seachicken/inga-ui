@@ -45,9 +45,9 @@ function reload(poss) {
         </div>
         Refresh
       </button>
-      <div id="entrypoint-nav" class="overflow-y-auto w-72 bg-white">
+      <div id="entrypoint-nav" class="overflow-y-auto truncate w-72 bg-white">
         <div class="flex items-center">
-          <span class="truncate text-clip m-2 text-ms text-gray-500">Impacted entrypoints</span>
+          <span class="text-clip m-2 text-ms text-gray-500">Impacted entrypoints</span>
         </div>
         <div class="ml-2">
           <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl=${repoUrl} headsha=${headSha} defaultindex=${selectedFileIndex}></file-tree>
