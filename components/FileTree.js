@@ -10,7 +10,7 @@ export default class FileTree extends withTwind(HTMLElement) {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.innerHTML = `
-      <ul id="file-list" class="truncate"></ul>
+      <ul id="file-list"></ul>
 
       <template id="dir-item">
         <tree-item class="item">
