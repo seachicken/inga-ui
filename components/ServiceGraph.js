@@ -22,7 +22,7 @@ sheet.target.replaceSync(`
   }
 
   .edge-select {
-    stroke-dasharray: 8;
+    stroke-dasharray: 7;
     animation: edge-animation 50s linear infinite;
   }
   @keyframes edge-animation {
@@ -261,19 +261,20 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   renderEdge(dom1, dom2, selected) {
-    const edge = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const edge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     if (selected) {
       edge.classList.add('edge-select');
     }
     const panelRect = this.panel.getBoundingClientRect();
     const dom1Rect = dom1.getBoundingClientRect();
     const dom2Rect = dom2.getBoundingClientRect();
-    edge.setAttribute('x1', dom1Rect.right - panelRect.left);
-    edge.setAttribute('y1', dom1Rect.top + (dom2Rect.height / 2) - panelRect.top);
-    edge.setAttribute('x2', dom2Rect.left - panelRect.left);
-    edge.setAttribute('y2', dom2Rect.top + (dom1Rect.height / 2) - panelRect.top);
+    const x1 = dom1Rect.right - panelRect.left;
+    const y1 = dom1Rect.top + (dom2Rect.height / 2) - panelRect.top;
+    const x2 = dom2Rect.left - panelRect.left;
+    const y2 = dom2Rect.top + (dom1Rect.height / 2) - panelRect.top;
+    edge.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1} ${x2 - 20} ${y2} ${x2} ${y2}`);
     edge.setAttribute('stroke', selected ? tw.theme('colors.blue.500') : tw.theme('colors.gray.300'));
-    edge.setAttribute('fill', selected ? tw.theme('colors.blue.500') : tw.theme('colors.gray.300'));
+    edge.setAttribute('fill', 'transparent');
     edge.setAttribute('stroke-width', selected ? '3' : '2');
     this.edges.appendChild(edge);
   }
