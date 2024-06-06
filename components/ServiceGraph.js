@@ -156,7 +156,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
 
     const filePossOut = getFilePoss(graph.innerConnections
-      .flatMap((c) => c.origins)
+      .flatMap((c) => c.origins.filter((o) => getPosKey(o) !== getPosKey(c.entrypoint)))
       .map((p) => ({ origin: p })), groupKey.ORIGIN)
       .filter((p) => p.type === fileType.FILE);
     for (const filePosOut of filePossOut) {

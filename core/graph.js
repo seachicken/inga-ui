@@ -36,9 +36,13 @@ export function create(reportedPoss) {
   }
 
   for (const service of Array.from(services.values())) {
+    console.log(`===service: ${JSON.stringify(service, null, 2)}`);
+    console.log(`entrypointConnections: ${JSON.stringify(Array.from(entrypointConnections), null, 2)}`);
     const originConns = service.poss
       .flatMap((pos) => entrypointConnections.get(getPosKey(pos.origin)) || []);
+    console.log(`service: ${service.name}, originConns: ${JSON.stringify(originConns, null, 2)}`);
     for (const originConn of originConns) {
+      // originConn は１つ
       if (service.neighbours) {
         service.neighbours.push(originConn);
       } else {
@@ -48,15 +52,19 @@ export function create(reportedPoss) {
       const neighbourServices = Array.from(services.values())
         .filter((s) => s.poss
           .find((pos) => getPosKey(pos.entrypoint) === getPosKey(originConn.origin)));
+      console.log(`neighbourServices: ${JSON.stringify(neighbourServices, null, 2)}`);
       if (originConn.neighbours) {
         originConn.neighbours.push(...neighbourServices);
       } else {
         originConn.neighbours = neighbourServices;
       }
+      console.log(`originConn.neighbours: ${JSON.stringify(originConn.neighbours, null, 2)}`);
     }
   }
 
-  return findRootServiecs(services, originConnections).map((s) => toNode(s));
+  const results = findRootServiecs(services, originConnections).map((s) => toNode(s));
+  console.log(`results: ${JSON.stringify(results, null, 2)}`);
+  return results;
 }
 
 export function findLeafPoss(graphs) {
@@ -83,6 +91,7 @@ function findRootServiecs(services, originConnections) {
       results.push(service);
     }
   }
+  console.log(`rootServices: ${JSON.stringify(results, null, 2)}`);
   return results;
 }
 
