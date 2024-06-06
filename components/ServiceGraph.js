@@ -47,7 +47,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="service-template">
-        <div class="service absolute bg-white rounded m-3 p-2" draggable="true">
+        <div class="service absolute bg-white rounded m-3 p-2">
           <p class="name relative text-gray-400 z-30"></p>
           <div class="flex">
             <div class="in">
