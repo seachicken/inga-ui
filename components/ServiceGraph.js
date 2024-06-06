@@ -41,9 +41,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <div id="panel" class="w-screen h-screen">
-        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="w-screen h-screen"></svg>
-        <div id="nodes" class="w-screen h-screen"></div>
+      <div id="panel" class="w-full h-full">
+        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="w-full h-full"></svg>
+        <div id="nodes" class="w-full h-full"></div>
       </div>
 
       <template id="service-template">
