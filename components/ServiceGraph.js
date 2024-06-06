@@ -43,6 +43,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.shadowRoot.innerHTML = `
       <div id="panel" class="w-screen h-screen">
         <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="w-screen h-screen"></svg>
+        <div id="nodes" class="w-screen h-screen"></div>
       </div>
 
       <template id="service-template">
@@ -80,6 +81,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     `;
 
     this.panel = this.shadowRoot.querySelector('#panel');
+    this.nodes = this.shadowRoot.querySelector('#nodes');
     this.edges = this.shadowRoot.querySelector('#edges');
     this.serviceTemplate = this.shadowRoot.querySelector('#service-template');
     this.fileTemplate = this.shadowRoot.querySelector('#file-template');
@@ -131,6 +133,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   render() {
+    this.nodes.innerHTML = '';
     for (let i = 0; i < this.graphs.length; i += 1) {
       this.renderGraph(this.graphs[i], i);
     }
@@ -146,7 +149,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     service.style.left = `${depth * 430}px`;
     service.style.top = `${i * 150}px`;
     service.querySelector('.name').innerHTML = graph.service;
-    this.panel.appendChild(service);
+    this.nodes.appendChild(service);
 
     const filePossIn = getFilePoss(graph.innerConnections
       .map((c) => ({ entrypoint: c.entrypoint })))
