@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 const jsonPath = process.env.npm_config_ingapath;
-const repoUrl = process.env.npm_config_ingaurl || 'https://github.com/owner/repo';
+const repoUrl = process.env.npm_config_ingaurl || '';
 const headSha = process.env.npm_config_ingasha || '';
 const prNumber = process.env.npm_config_inganumber || '';
 

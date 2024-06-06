@@ -50,11 +50,11 @@ function reload(poss) {
           <span class="text-clip m-2 text-ms text-gray-500">Impacted entrypoints</span>
         </div>
         <div class="ml-2">
-          <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl=${repoUrl} headsha=${headSha} defaultindex=${selectedFileIndex}></file-tree>
+          <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
         </div>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="relative overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} repourl=${repoUrl} prnumber=${prNumber}></service-graph>
+      <service-graph id="service-graph" class="relative overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 

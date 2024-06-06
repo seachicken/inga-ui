@@ -118,7 +118,11 @@ export default class FileTree extends withTwind(HTMLElement) {
           decItem.nest = pos.nest + 1;
           decItem.activable = true;
           decItem.querySelector('.name').innerHTML = declaration.name;
-          decItem.querySelector('.link').href = `${this.repoUrl}/blob/${this.headSha}/${declaration.path}#L${declaration.line}`;
+          if (this.repoUrl) {
+            decItem.querySelector('.link').href = `${this.repoUrl}/blob/${this.headSha}/${declaration.path}#L${declaration.line}`;
+          } else {
+            decItem.querySelector('.link').remove();
+          }
           decItem.onStateChanged = (state) => {
             if (this.prevSelectItem?.active && state !== itemSelectState.SELECT) {
               return;

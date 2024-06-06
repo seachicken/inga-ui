@@ -191,12 +191,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       const declarationRoot = document.importNode(this.declarationTemplate.content, true);
       const declaration = declarationRoot.querySelector('.declaration');
       declaration.querySelector('.name').innerHTML = dec.name;
-      if (fileChanged) {
+      if (fileChanged && this.repoUrl) {
         toSha256(dec.path).then((sha) => {
           declaration.querySelector('.link').href = `${this.repoUrl}/pull/${this.prNumber}/files#diff-${sha}R${dec.line}`;
         });
       } else {
-        declaration.querySelector('.link').classList.add('hidden');
+        declaration.querySelector('.link').remove();
       }
       file.querySelector('.declarations').appendChild(declaration);
 
