@@ -6,6 +6,7 @@ const withTwind = install(config);
 const sheet = cssomSheet({ target: new CSSStyleSheet() });
 sheet.target.replaceSync(`
   .hover {
+    cursor: pointer;
     background-color: ${tw.theme('colors.gray.100')};
   }
   .active {
