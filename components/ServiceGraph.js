@@ -8,30 +8,39 @@ import { fileType, getFilePoss, groupKey } from '../core/sort.js';
 const withTwind = install(config);
 const sheet = cssomSheet({ target: new CSSStyleSheet() });
 sheet.target.replaceSync(`
-  .file {
+  .declaration {
     background-color: ${tw.theme('colors.white')};
   }
-  .file-hover {
+  .declaration-hover {
     background-color: ${tw.theme('colors.gray.100')};
   }
-  .file-select {
+  .declaration-select {
     background-color: ${tw.theme('colors.blue.100')};
   }
-  .file-changed {
-    background-color: ${tw.theme('colors.green.50')};
-  }
 
-  .edge-select {
-    stroke-dasharray: 7;
-    animation: edge-animation 50s linear infinite;
+  .joint::before {
+    background-color: ${tw.theme('colors.white')};
   }
-  @keyframes edge-animation {
-    0% {
-      stroke-dashoffset: 0;
-    }
-    100% {
-      stroke-dashoffset: 1000;
-    }
+  .joint::after {
+    background-color: ${tw.theme('colors.gray.300')};
+  }
+  .joint-hover::before {
+    background-color: ${tw.theme('colors.white')};
+  }
+  .joint-hover::after {
+    background-color: ${tw.theme('colors.blue.500')};
+  }
+  .joint-hover-select::before {
+    background-color: ${tw.theme('colors.gray.100')};
+  }
+  .joint-hover-select::after {
+    background-color: ${tw.theme('colors.blue.500')};
+  }
+  .joint-select::before {
+    background-color: ${tw.theme('colors.blue.100')};
+  }
+  .joint-select::after {
+    background-color: ${tw.theme('colors.blue.500')};
   }
 `);
 
@@ -47,8 +56,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="service-template">
-        <div class="service absolute bg-white rounded m-3 p-2">
-          <p class="name relative text-gray-400 z-30"></p>
+        <div class="service absolute rounded m-3 p-2">
+          <p class="name relative bg-white text-gray-400 z-30"></p>
           <div class="flex">
             <div class="in">
             </div>
@@ -59,7 +68,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="file-template">
-        <div class="file relative rounded drop-shadow m-3 py-1 z-20">
+        <div class="file relative rounded bg-white drop-shadow m-3 py-1 z-20">
           <div class="flex mb-1 px-2 items-center">
             <div class="changed-icon fill-green mr-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M1 1.75C1 .784 1.784 0 2.75 0h7.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V4.664a.25.25 0 0 0-.073-.177l-2.914-2.914a.25.25 0 0 0-.177-.073ZM8 3.25a.75.75 0 0 1 .75.75v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5a.75.75 0 0 1-1.5 0V7h-1.5a.75.75 0 0 1 0-1.5h1.5V4A.75.75 0 0 1 8 3.25Zm-3 8a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"></path></svg>
@@ -71,12 +80,18 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="declaration-template">
-        <li class="declaration flex items-center">
-          <p class="name text-gray-700 text-sm px-2"></p>
+        <li class="declaration flex items-center h-4">
+          <div class="joint-slot absolute -left-1"></div>
+          <p class="name text-gray-700 text-sm mx-3"></p>
           <a target="_blank" class="link">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path></svg>
           </a>
+          <div class="joint-slot absolute right-1"></div>
         </li>
+      </template>
+
+      <template id="joint-template">
+        <div class="joint before:absolute before:w-4 before:h-4 before:-top-2 before:-left-1 before:rounded-full after:absolute after:w-2 after:h-2 after:-top-1 after:rounded-full"></div>
       </template>
     `;
 
@@ -86,6 +101,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.serviceTemplate = this.shadowRoot.querySelector('#service-template');
     this.fileTemplate = this.shadowRoot.querySelector('#file-template');
     this.declarationTemplate = this.shadowRoot.querySelector('#declaration-template');
+    this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
     this.declarations = new Map();
     this.selectEntrypointState = itemSelectState.NORMAL;
   }
@@ -113,15 +129,21 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       this.selectEntrypointState = obj.state;
       this.selectEntrypoint = obj.posKey;
 
-      for (const file of this.declarations.values()) {
-        file.classList.remove('file-hover', 'file-select');
+      for (const dec of this.declarations.values()) {
+        dec.classList.remove('declaration-hover', 'declaration-select');
+        dec.querySelectorAll('.joint')
+          .forEach((j) => j.classList.remove('joint-hover', 'joint-hover-select', 'joint-select'));
       }
       switch (this.selectEntrypointState) {
         case itemSelectState.OVER:
-          this.declarations.get(this.selectEntrypoint).classList.add('file-hover');
+          this.declarations.get(this.selectEntrypoint).classList.add('declaration-hover');
+          this.declarations.get(this.selectEntrypoint)
+            .querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover-select'));
           break;
         case itemSelectState.SELECT:
-          this.declarations.get(this.selectEntrypoint).classList.add('file-select');
+          this.declarations.get(this.selectEntrypoint).classList.add('declaration-select');
+          this.declarations.get(this.selectEntrypoint)
+            .querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select'));
           break;
         default:
       }
@@ -179,9 +201,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     const fileChanged = pos.declarations
       .find((d) => this.filesChangedPoss.find((p) => getPosKey(p) === getPosKey(d)));
-    if (fileChanged) {
-      file.classList.add('file-changed');
-    } else {
+    if (!fileChanged) {
       file.querySelector('.changed-icon').classList.add('hidden');
     }
 
@@ -199,6 +219,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         declaration.querySelector('.link').remove();
       }
       file.querySelector('.declarations').appendChild(declaration);
+
+      for (const jointSlot of declaration.querySelectorAll('.joint-slot')) {
+        const jointRoot = document.importNode(this.jointTemplate.content, true);
+        const joint = jointRoot.querySelector('.joint');
+        jointSlot.appendChild(joint);
+      }
 
       this.declarations.set(getPosKey(dec), declaration);
     }
@@ -225,14 +251,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
           );
           if (getPosKey(innerConn.entrypoint) === this.selectEntrypoint) {
             parentKeys.push(getPosKey(origin));
-          }
-          if (selected && this.filesChangedPoss
-            .find((p) => getPosKey(p) === getPosKey(origin))) {
-            if (this.selectEntrypointState === itemSelectState.OVER) {
-              this.declarations.get(getPosKey(origin)).classList.add('file-hover');
-            } else if (this.selectEntrypointState === itemSelectState.SELECT) {
-              this.declarations.get(getPosKey(origin)).classList.add('file-select');
-            }
           }
         }
       }
@@ -263,7 +281,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   renderEdge(dom1, dom2, selected) {
     const edge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     if (selected) {
-      edge.classList.add('edge-select');
+      dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover'));
+      dom2.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover'));
     }
     const panelRect = this.panel.getBoundingClientRect();
     const dom1Rect = dom1.getBoundingClientRect();
