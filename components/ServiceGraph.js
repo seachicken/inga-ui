@@ -56,8 +56,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="service-template">
-        <div class="service absolute rounded m-3 p-2">
-          <p class="name relative bg-white text-gray-400 z-30"></p>
+        <div class="service absolute rounded z-30 m-3 p-2 hover:ring-2 cursor-move select-none">
+          <span class="name relative bg-white rounded-full px-2 py-1 text-green"></span>
           <div class="flex">
             <div class="in">
             </div>
@@ -68,7 +68,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="file-template">
-        <div class="file relative rounded bg-white drop-shadow m-3 py-1 z-20">
+        <div class="file relative rounded bg-white border-1 drop-shadow m-3 py-1 z-20">
           <div class="flex mb-1 px-2 items-center">
             <div class="changed-icon fill-green mr-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M1 1.75C1 .784 1.784 0 2.75 0h7.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V4.664a.25.25 0 0 0-.073-.177l-2.914-2.914a.25.25 0 0 0-.177-.073ZM8 3.25a.75.75 0 0 1 .75.75v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5a.75.75 0 0 1-1.5 0V7h-1.5a.75.75 0 0 1 0-1.5h1.5V4A.75.75 0 0 1 8 3.25Zm-3 8a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"></path></svg>
@@ -171,6 +171,26 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     service.style.left = `${depth * 430}px`;
     service.style.top = `${i * 150}px`;
     service.querySelector('.name').innerHTML = graph.service;
+
+    service.addEventListener('mousedown', (e) => {
+      const panelRect = this.panel.getBoundingClientRect();
+      const offsetX = panelRect.left + e.clientX - service.getBoundingClientRect().left;
+      const offsetY = panelRect.top + e.clientY - service.getBoundingClientRect().top;
+
+      const drag = (de) => {
+        service.style.left = `${de.clientX - offsetX}px`;
+        service.style.top = `${de.clientY - offsetY}px`;
+
+        this.edges.innerHTML = '';
+        this.renderEdges(this.graphs, this.declarations);
+      };
+
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', drag);
+      });
+    });
+
     this.nodes.appendChild(service);
 
     const filePossIn = getFilePoss(graph.innerConnections
