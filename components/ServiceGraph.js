@@ -50,14 +50,14 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <div id="panel" class="w-full h-full bg-white">
+      <div id="panel" class="w-full h-full bg-gray-100">
         <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10"></svg>
         <div id="nodes" class="absolute w-full h-full"></div>
       </div>
 
       <template id="service-template">
         <div class="service absolute rounded z-30 m-3 p-2 hover:ring-2 cursor-move select-none">
-          <span class="name relative bg-white rounded-full px-2 py-1 text-green"></span>
+          <span class="name relative bg-gray-100 rounded-lg px-2 py-1 text-lg"></span>
           <div class="flex">
             <div class="in">
             </div>
