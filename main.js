@@ -8,6 +8,7 @@ import {
   fileType,
   getFilePoss,
 } from './core/sort.js';
+import { selectState } from './core/state.js';
 
 install(config);
 
@@ -25,6 +26,7 @@ let stateHash;
 let entrypointTree = [];
 let graphs = [];
 let selectedFileIndex = 0;
+let enableSync = false;
 
 async function loadReport() {
   const response = await fetch('report.json');
@@ -64,7 +66,7 @@ function reload(poss) {
         </div>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="relative overflow-auto w-full h-full bg-gray-100" src=${JSON.stringify(graphs)} state=${JSON.stringify(state)} repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="relative overflow-auto w-full h-full bg-gray-100" src=${JSON.stringify(graphs)} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
@@ -83,6 +85,13 @@ function reload(poss) {
       }),
     );
   });
+
+  serviceGraph.onStateChanged = (s) => {
+    enableSync = s === selectState.SELECT;
+    if (s === selectState.SELECT) {
+      initLoad();
+    }
+  };
 
   function risizeSeperator(e) {
     entrypointNav.style.flexBasis = `${e.x}px`;
@@ -106,7 +115,12 @@ function reload(poss) {
     if (newReportHash !== reportHash) {
       reportHash = newReportHash;
       report = reportObj;
-      document.querySelector('#refresh-button').classList.remove('hidden');
+      if (enableSync) {
+        reload(report);
+        document.querySelector('#refresh-button').classList.add('hidden');
+      } else {
+        document.querySelector('#refresh-button').classList.remove('hidden');
+      }
     }
 
     const stateObj = await loadState();
@@ -129,10 +143,12 @@ async function digest(msg) {
     .join('');
 }
 
-(async () => {
+async function initLoad() {
   if (report.length === 0) {
     report = await loadReport();
   }
   reportHash = await digest(JSON.stringify(report));
   reload(report);
-})();
+}
+
+initLoad();

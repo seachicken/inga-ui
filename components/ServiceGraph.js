@@ -119,14 +119,16 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
     this.declarations = new Map();
     this.selectEntrypointState = selectState.NORMAL;
+    this.callbackStateChanged = () => {};
 
     const syncButton = this.shadowRoot.querySelector('#sync-button');
-    this.enableSync = true;
     const onSelectSyncButton = () => {
       if (this.enableSync) {
         syncButton.classList.add('sync-button-select');
+        this.callbackStateChanged(selectState.SELECT);
       } else {
         syncButton.classList.remove('sync-button-select');
+        this.callbackStateChanged(selectState.NORMAL);
       }
     };
     onSelectSyncButton();
@@ -142,8 +144,20 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     });
   }
 
+  get enableSync() {
+    return this.getAttribute('enablesync') === 'true';
+  }
+
+  set enableSync(value) {
+    this.setAttribute('enablesync', value);
+  }
+
+  set onStateChanged(callback) {
+    this.callbackStateChanged = callback;
+  }
+
   static get observedAttributes() {
-    return ['src', 'state', 'repourl', 'prnumber', 'entrypointselect'];
+    return ['src', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
