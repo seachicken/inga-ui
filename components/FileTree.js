@@ -1,7 +1,7 @@
 import install from '@twind/with-web-components';
 import config from '../twind.config';
 import { fileType } from '../core/sort.js';
-import { itemSelectState } from './TreeItem.js';
+import { selectState } from '../core/state.js';
 
 const withTwind = install(config);
 
@@ -124,10 +124,10 @@ export default class FileTree extends withTwind(HTMLElement) {
             decItem.querySelector('.link').remove();
           }
           decItem.onStateChanged = (state) => {
-            if (this.prevSelectItem?.active && state !== itemSelectState.SELECT) {
+            if (this.prevSelectItem?.active && state !== selectState.SELECT) {
               return;
             }
-            if (state === itemSelectState.SELECT) {
+            if (state === selectState.SELECT) {
               if (this.prevSelectItem && decItem !== this.prevSelectItem) {
                 this.prevSelectItem.active = false;
               }

@@ -1,6 +1,7 @@
 import { cssomSheet, tw } from 'twind';
 import install from '@twind/with-web-components';
 import config from '../twind.config';
+import { selectState } from '../core/state.js';
 
 const withTwind = install(config);
 const sheet = cssomSheet({ target: new CSSStyleSheet() });
@@ -17,12 +18,6 @@ sheet.target.replaceSync(`
     color: ${tw.theme('colors.gray.700')};
   }
 `);
-
-export const itemSelectState = {
-  NORMAL: 0,
-  OVER: 1,
-  SELECT: 2,
-};
 
 export default class TreeItem extends withTwind(HTMLElement) {
   constructor() {
@@ -106,10 +101,10 @@ export default class TreeItem extends withTwind(HTMLElement) {
         this.active = !this.active;
         if (this.active) {
           item.classList.add('active');
-          this.callbackStateChanged(itemSelectState.SELECT);
+          this.callbackStateChanged(selectState.SELECT);
         } else {
           item.classList.remove('active');
-          this.callbackStateChanged(itemSelectState.OVER);
+          this.callbackStateChanged(selectState.OVER);
         }
       });
       item.addEventListener('mouseover', () => {
@@ -117,14 +112,14 @@ export default class TreeItem extends withTwind(HTMLElement) {
           return;
         }
         item.classList.add('hover');
-        this.callbackStateChanged(itemSelectState.OVER);
+        this.callbackStateChanged(selectState.OVER);
       });
       item.addEventListener('mouseleave', () => {
         if (this.active) {
           return;
         }
         item.classList.remove('hover');
-        this.callbackStateChanged(itemSelectState.NORMAL);
+        this.callbackStateChanged(selectState.NORMAL);
       });
     }
   }

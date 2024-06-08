@@ -1,8 +1,8 @@
 import { cssomSheet, tw } from 'twind';
 import install from '@twind/with-web-components';
 import config from '../twind.config';
-import { itemSelectState } from './TreeItem.js';
 import { findLeafPoss, getPosKey } from '../core/graph.js';
+import { selectState } from '../core/state.js';
 import { fileType, getFilePoss, groupKey } from '../core/sort.js';
 
 const withTwind = install(config);
@@ -118,7 +118,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.declarationTemplate = this.shadowRoot.querySelector('#declaration-template');
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
     this.declarations = new Map();
-    this.selectEntrypointState = itemSelectState.NORMAL;
+    this.selectEntrypointState = selectState.NORMAL;
 
     const syncButton = this.shadowRoot.querySelector('#sync-button');
     this.enableSync = true;
@@ -189,12 +189,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
           .forEach((j) => j.classList.remove('joint-hover', 'joint-hover-select', 'joint-select'));
       }
       switch (this.selectEntrypointState) {
-        case itemSelectState.OVER:
+        case selectState.OVER:
           this.declarations.get(this.selectEntrypoint).classList.add('declaration-hover');
           this.declarations.get(this.selectEntrypoint)
             .querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover-select'));
           break;
-        case itemSelectState.SELECT:
+        case selectState.SELECT:
           this.declarations.get(this.selectEntrypoint).classList.add('declaration-select');
           this.declarations.get(this.selectEntrypoint)
             .querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select'));
@@ -310,10 +310,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       const parentKeys = [];
       for (const innerConn of graph.innerConnections) {
         if (parentKey) {
-          selected = this.selectEntrypointState !== itemSelectState.NORMAL
+          selected = this.selectEntrypointState !== selectState.NORMAL
             && parentKey === getPosKey(innerConn.entrypoint);
         } else {
-          selected = this.selectEntrypointState !== itemSelectState.NORMAL
+          selected = this.selectEntrypointState !== selectState.NORMAL
             && this.selectEntrypoint === getPosKey(innerConn.entrypoint);
         }
 
