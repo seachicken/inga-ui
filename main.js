@@ -133,6 +133,6 @@ async function digest(msg) {
   if (report.length === 0) {
     report = await loadReport();
   }
-  reportHash = await digest(report);
+  reportHash = await digest(JSON.stringify(report));
   reload(report);
 })();
