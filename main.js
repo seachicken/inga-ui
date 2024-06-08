@@ -37,7 +37,7 @@ async function loadReport() {
 async function loadState() {
   const response = await fetch('state.json');
   if (!response.ok) {
-    return [];
+    return {};
   }
   return response.json();
 }
@@ -101,17 +101,25 @@ function reload(poss) {
   });
 
   setInterval(async () => {
-    const obj = await loadState();
-    const hash = await digest(JSON.stringify(obj));
-    if (hash !== stateHash) {
-      stateHash = hash;
-      state = obj;
+    const reportObj = await loadReport();
+    const newReportHash = await digest(JSON.stringify(reportObj));
+    if (newReportHash !== reportHash) {
+      reportHash = newReportHash;
+      report = reportObj;
+      document.querySelector('#refresh-button').classList.remove('hidden');
+    }
+
+    const stateObj = await loadState();
+    const newStateHash = await digest(JSON.stringify(stateObj));
+    if (newStateHash !== stateHash) {
+      stateHash = newStateHash;
+      state = stateObj;
       serviceGraph.setAttribute(
         'state',
         JSON.stringify(state),
       );
     }
-  }, 1000);
+  }, 5000);
 }
 
 async function digest(msg) {
@@ -128,13 +136,3 @@ async function digest(msg) {
   reportHash = await digest(report);
   reload(report);
 })();
-
-setInterval(async () => {
-  const obj = await loadReport();
-  const hash = await digest(JSON.stringify(obj));
-  if (hash !== reportHash) {
-    reportHash = hash;
-    report = obj;
-    document.querySelector('#refresh-button').classList.remove('hidden');
-  }
-}, 5000);

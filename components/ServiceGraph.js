@@ -158,13 +158,13 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       }
 
       const state = JSON.parse(newValue);
+      this.declarations.values().forEach((d) => d.closest('.file').classList.remove('ring-2'));
       for (const [key, dec] of this.declarations) {
-        const file = dec.closest('.file');
         if (key.startsWith(state.didChange)) {
+          const file = dec.closest('.file');
           file.classList.add('ring-2');
           this.scrollTo(file.getBoundingClientRect().left, file.getBoundingClientRect().top);
-        } else {
-          file.classList.remove('ring-2');
+          break;
         }
       }
     }
