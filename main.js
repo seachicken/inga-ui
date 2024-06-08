@@ -20,12 +20,22 @@ const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
 let report = window.inga_report;
 let reportHash;
+let state = {};
+let stateHash;
 let entrypointTree = [];
 let graphs = [];
 let selectedFileIndex = 0;
 
 async function loadReport() {
   const response = await fetch('report.json');
+  if (!response.ok) {
+    return [];
+  }
+  return response.json();
+}
+
+async function loadState() {
+  const response = await fetch('state.json');
   if (!response.ok) {
     return [];
   }
@@ -54,7 +64,7 @@ function reload(poss) {
         </div>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="relative w-full h-full overflow-auto" src=${JSON.stringify(graphs)} repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="relative overflow-auto w-full h-full bg-gray-100" src=${JSON.stringify(graphs)} state=${JSON.stringify(state)} repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
@@ -89,6 +99,19 @@ function reload(poss) {
     reload(report);
     document.querySelector('#refresh-button').classList.add('hidden');
   });
+
+  setInterval(async () => {
+    const obj = await loadState();
+    const hash = await digest(JSON.stringify(obj));
+    if (hash !== stateHash) {
+      stateHash = hash;
+      state = obj;
+      serviceGraph.setAttribute(
+        'state',
+        JSON.stringify(state),
+      );
+    }
+  }, 1000);
 }
 
 async function digest(msg) {
@@ -107,11 +130,11 @@ async function digest(msg) {
 })();
 
 setInterval(async () => {
-  const json = await loadReport();
-  const hash = await digest(json);
+  const obj = await loadReport();
+  const hash = await digest(JSON.stringify(obj));
   if (hash !== reportHash) {
     reportHash = hash;
-    report = json;
+    report = obj;
     document.querySelector('#refresh-button').classList.remove('hidden');
   }
 }, 5000);

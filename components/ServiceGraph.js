@@ -42,6 +42,16 @@ sheet.target.replaceSync(`
   .joint-select::after {
     background-color: ${tw.theme('colors.blue.500')};
   }
+
+  .sync-button-hover {
+    background-color: ${tw.theme('colors.gray.200')};
+  }
+  .sync-button-select {
+    background-color: ${tw.theme('colors.blue.500')};
+  }
+  .sync-button-select div {
+    fill: ${tw.theme('colors.white')};
+  }
 `);
 
 export default class ServiceGraph extends withTwind(HTMLElement) {
@@ -50,9 +60,14 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <div id="panel" class="w-full h-full bg-gray-100">
+      <div id="panel" class="w-full h-full">
         <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10"></svg>
         <div id="nodes" class="absolute w-full h-full"></div>
+        <button id="sync-button" class="flex items-end fixed mt-2 z-50 max-w-max mx-auto right-5 bottom-5 rounded-md border-1">
+          <div class="fill-gray-500 m-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z"></path></svg>
+          </div>
+        </button>
       </div>
 
       <template id="service-template">
@@ -104,10 +119,31 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
     this.declarations = new Map();
     this.selectEntrypointState = itemSelectState.NORMAL;
+
+    const syncButton = this.shadowRoot.querySelector('#sync-button');
+    this.enableSync = true;
+    const onSelectSyncButton = () => {
+      if (this.enableSync) {
+        syncButton.classList.add('sync-button-select');
+      } else {
+        syncButton.classList.remove('sync-button-select');
+      }
+    };
+    onSelectSyncButton();
+    syncButton.addEventListener('click', () => {
+      this.enableSync = !this.enableSync;
+      onSelectSyncButton();
+    });
+    syncButton.addEventListener('mouseover', () => {
+      syncButton.classList.add('sync-button-hover');
+    });
+    syncButton.addEventListener('mouseleave', () => {
+      syncButton.classList.remove('sync-button-hover');
+    });
   }
 
   static get observedAttributes() {
-    return ['src', 'repourl', 'prnumber', 'entrypointselect'];
+    return ['src', 'state', 'repourl', 'prnumber', 'entrypointselect'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -115,6 +151,22 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       this.graphs = JSON.parse(newValue);
       this.filesChangedPoss = findLeafPoss(this.graphs);
       this.render();
+    }
+    if (name === 'state') {
+      if (!this.enableSync) {
+        return;
+      }
+
+      const state = JSON.parse(newValue);
+      for (const [key, dec] of this.declarations) {
+        const file = dec.closest('.file');
+        if (key.startsWith(state.didChange)) {
+          file.classList.add('ring-2');
+          this.scrollTo(file.getBoundingClientRect().left, file.getBoundingClientRect().top);
+        } else {
+          file.classList.remove('ring-2');
+        }
+      }
     }
     if (name === 'repourl') {
       this.repoUrl = newValue;
