@@ -20,8 +20,9 @@ const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
 let report = window.inga_report;
-let reportHash;
+let reportHash = '';
 let state = {};
+let stateHash = '';
 let entrypointTree = [];
 let graphs = [];
 let selectedFileIndex = 0;
@@ -89,6 +90,9 @@ function reload(poss) {
     enableSync = s === selectState.SELECT;
     if (s === selectState.SELECT) {
       initLoad();
+    } else {
+      state = {};
+      stateHash = '';
     }
   };
 
@@ -107,24 +111,6 @@ function reload(poss) {
     reload(report);
     document.querySelector('#refresh-button').classList.add('hidden');
   });
-
-  setInterval(async () => {
-    const reportObj = await loadReport();
-    const newReportHash = await digest(JSON.stringify(reportObj));
-    if (newReportHash !== reportHash) {
-      reportHash = newReportHash;
-      report = reportObj;
-      if (enableSync) {
-        reload(report);
-        document.querySelector('#refresh-button').classList.add('hidden');
-      } else {
-        document.querySelector('#refresh-button').classList.remove('hidden');
-      }
-    }
-
-    state = await loadState();
-    serviceGraph.setAttribute('state', JSON.stringify(state));
-  }, 5000);
 }
 
 async function digest(msg) {
@@ -138,6 +124,41 @@ async function initLoad() {
   report = await loadReport();
   reportHash = await digest(JSON.stringify(report));
   reload(report);
+
+  if (enableSync) {
+    state = await loadState();
+    stateHash = await digest(JSON.stringify(state));
+    document.querySelector('#service-graph')
+      .setAttribute('state', JSON.stringify(state));
+  }
 }
 
 initLoad();
+
+setInterval(async () => {
+  const reportObj = await loadReport();
+  const newReportHash = await digest(JSON.stringify(reportObj));
+  if (newReportHash !== reportHash) {
+    report = reportObj;
+    reportHash = newReportHash;
+    if (enableSync) {
+      reload(report);
+      document.querySelector('#refresh-button').classList.add('hidden');
+      state = {};
+      stateHash = '';
+    } else {
+      document.querySelector('#refresh-button').classList.remove('hidden');
+    }
+  }
+
+  if (enableSync) {
+    const stateObj = await loadState();
+    const newStateHash = await digest(JSON.stringify(stateObj));
+    if (newStateHash !== stateHash) {
+      state = stateObj;
+      stateHash = newStateHash;
+      document.querySelector('#service-graph')
+        .setAttribute('state', JSON.stringify(state));
+    }
+  }
+}, 5000);

@@ -128,6 +128,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         this.callbackStateChanged(selectState.SELECT);
       } else {
         syncButton.classList.remove('sync-button-select');
+        for (const dec of this.declarations.values()) {
+          dec.closest('.file').classList.remove('ring-2');
+        }
         this.callbackStateChanged(selectState.NORMAL);
       }
     };
