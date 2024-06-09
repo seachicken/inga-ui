@@ -22,7 +22,6 @@ const prNumber = window.inga_pr_number;
 let report = window.inga_report;
 let reportHash;
 let state = {};
-let stateHash;
 let entrypointTree = [];
 let graphs = [];
 let selectedFileIndex = 0;
@@ -123,16 +122,8 @@ function reload(poss) {
       }
     }
 
-    const stateObj = await loadState();
-    const newStateHash = await digest(JSON.stringify(stateObj));
-    if (newStateHash !== stateHash) {
-      stateHash = newStateHash;
-      state = stateObj;
-      serviceGraph.setAttribute(
-        'state',
-        JSON.stringify(state),
-      );
-    }
+    state = await loadState();
+    serviceGraph.setAttribute('state', JSON.stringify(state));
   }, 5000);
 }
 
@@ -144,9 +135,7 @@ async function digest(msg) {
 }
 
 async function initLoad() {
-  if (report.length === 0) {
-    report = await loadReport();
-  }
+  report = await loadReport();
   reportHash = await digest(JSON.stringify(report));
   reload(report);
 }
