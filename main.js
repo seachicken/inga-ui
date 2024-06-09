@@ -66,7 +66,7 @@ function reload(poss) {
         </div>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="relative overflow-auto w-full h-full bg-gray-100" src=${JSON.stringify(graphs)} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
@@ -93,11 +93,11 @@ function reload(poss) {
     }
   };
 
-  function risizeSeperator(e) {
-    entrypointNav.style.flexBasis = `${e.x}px`;
-  }
-
   separator.addEventListener('mousedown', () => {
+    const risizeSeperator = (e) => {
+      entrypointNav.style.flexBasis = `${e.clientX}px`;
+    };
+
     document.addEventListener('mousemove', risizeSeperator);
     document.addEventListener('mouseup', () => {
       document.removeEventListener('mousemove', risizeSeperator);

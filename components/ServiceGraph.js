@@ -60,7 +60,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <div id="panel" class="w-full h-full">
+      <div id="panel" class="relative w-full h-full">
         <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10"></svg>
         <div id="nodes" class="absolute w-full h-full"></div>
         <button id="sync-button" class="flex items-end fixed mt-2 z-50 max-w-max mx-auto right-5 bottom-5 rounded-md border-1">
