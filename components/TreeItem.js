@@ -14,7 +14,6 @@ sheet.target.replaceSync(`
     background-color: ${tw.theme('colors.blue.100')};
   }
   .declaration-name {
-    font-size: 0.875rem;
     color: ${tw.theme('colors.gray.700')};
   }
 `);
