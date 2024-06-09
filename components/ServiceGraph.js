@@ -60,9 +60,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
-      <div id="panel" class="relative w-full h-full">
-        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10"></svg>
-        <div id="nodes" class="absolute w-full h-full"></div>
+      <div id="panel" class="relative w-screen h-screen">
+        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-screen h-screen z-10"></svg>
+        <div id="nodes" class="absolute w-screen h-screen"></div>
         <button id="sync-button" class="flex items-end fixed mt-2 z-50 max-w-max mx-auto right-5 bottom-5 rounded-md border-1">
           <div class="fill-gray-500 m-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path></svg>
