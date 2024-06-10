@@ -300,7 +300,7 @@ test('create graphs with a common parent', () => {
   );
 });
 
-test('create graphs with related and orphan declarations', { only: true }, () => {
+test('create graphs with related and orphan declarations', () => {
   assert.deepStrictEqual(
     create([
       {
