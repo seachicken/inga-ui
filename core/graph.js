@@ -69,10 +69,35 @@ export function findLeafPoss(graphs) {
     if (graph.type === 'entrypoint' && !graph.neighbours) {
       results.push(...graph.innerConnections.flatMap((c) => c.origins));
     }
-
     q.push(...graph.neighbours || []);
   }
 
+  return results;
+}
+
+export function findParentDeclarationKeys(targetPos, graphs) {
+  const results = new Set();
+  results.add(getPosKey(targetPos));
+  findParentDeclarationKeysRecursive(targetPos, graphs).forEach((d) => results.add(d));
+  return results;
+}
+
+function findParentDeclarationKeysRecursive(targetPos, graphs) {
+  const results = [];
+  const q = [];
+  q.push(...graphs);
+
+  while (q.length > 0) {
+    const graph = q.shift();
+    for (const conn of graph.innerConnections) {
+      if ((graph.type === 'entrypoint' && conn.origins.some((o) => getPosKey(o) === getPosKey(targetPos)))
+        || (graph.type === 'connection' && getPosKey(conn.origin) === getPosKey(targetPos))) {
+        results.push(getPosKey(conn.entrypoint));
+        results.push(...findParentDeclarationKeysRecursive(conn.entrypoint, graphs));
+      }
+    }
+    q.push(...graph.neighbours || []);
+  }
   return results;
 }
 

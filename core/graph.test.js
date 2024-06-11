@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { test } from 'node:test';
-import { create, findLeafPoss } from './graph.js';
+import { create, findParentDeclarationKeys, findLeafPoss } from './graph.js';
 
 test('create graphs', () => {
   assert.deepStrictEqual(
@@ -445,5 +445,106 @@ test('filter by files changed', () => {
         path: 'b/A.java', name: 'a', line: 1, offset: 1,
       },
     ],
+  );
+});
+
+test('find parent declarations', { only: true }, () => {
+  assert.deepStrictEqual(
+    findParentDeclarationKeys(
+      {
+        path: 'b/A.java', name: 'a', line: 1, offset: 1,
+      },
+      [
+        {
+          type: 'entrypoint',
+          service: 'A',
+          innerConnections: [
+            {
+              entrypoint: {
+                path: 'a/A.java', name: 'a', line: 1, offset: 1,
+              },
+              origins: [
+                {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+                {
+                  path: 'a/C.java', name: 'a', line: 1, offset: 1,
+                },
+              ],
+            },
+          ],
+          neighbours: [
+            {
+              type: 'connection',
+              innerConnections: [
+                {
+                  entrypoint: {
+                    path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                  },
+                  origin: {
+                    path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                  },
+                },
+              ],
+              neighbours: [
+                {
+                  type: 'entrypoint',
+                  service: 'B',
+                  innerConnections: [
+                    {
+                      entrypoint: {
+                        path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                      },
+                      origins: [
+                        {
+                          path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'connection',
+              innerConnections: [
+                {
+                  entrypoint: {
+                    path: 'a/C.java', name: 'a', line: 1, offset: 1,
+                  },
+                  origin: {
+                    path: 'c/B.java', name: 'a', line: 1, offset: 1,
+                  },
+                },
+              ],
+              neighbours: [
+                {
+                  type: 'entrypoint',
+                  service: 'C',
+                  innerConnections: [
+                    {
+                      entrypoint: {
+                        path: 'c/B.java', name: 'a', line: 1, offset: 1,
+                      },
+                      origins: [
+                        {
+                          path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    ),
+    new Set([
+      'a/A.java-a-1-1',
+      'a/B.java-a-1-1',
+      'b/B.java-a-1-1',
+      'b/A.java-a-1-1',
+    ]),
   );
 });
