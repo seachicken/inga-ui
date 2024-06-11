@@ -11,7 +11,7 @@ sheet.target.replaceSync(`
     background-color: ${tw.theme('colors.gray.100')};
   }
   .active {
-    background-color: ${tw.theme('colors.blue.100')};
+    background-color: ${tw.theme('colors.green.100')};
   }
   .declaration-name {
     color: ${tw.theme('colors.gray.700')};
@@ -25,7 +25,7 @@ export default class TreeItem extends withTwind(HTMLElement) {
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
       <li>
-        <div id="item" class="w-full py-1 rounded-lg">
+        <div id="item" class="w-full py-1">
           <div id="head" class="flex items-center">
             <div id="expand-icon" class="px-1 invisible"></div>
             <slot name="icon" class="fill-green"></slot>

@@ -1,7 +1,7 @@
 import { cssomSheet, tw } from 'twind';
 import install from '@twind/with-web-components';
 import config from '../twind.config';
-import { findLeafPoss, getPosKey } from '../core/graph.js';
+import { findLeafPoss, findParentDeclarationKeys, getPosKey } from '../core/graph.js';
 import { selectState } from '../core/state.js';
 import { fileType, getFilePoss, groupKey } from '../core/sort.js';
 
@@ -14,33 +14,48 @@ sheet.target.replaceSync(`
   .declaration-hover {
     background-color: ${tw.theme('colors.gray.100')};
   }
-  .declaration-select {
+  .declaration-select-impacted {
+    background-color: ${tw.theme('colors.green.100')};
+  }
+  .declaration-select-changed {
     background-color: ${tw.theme('colors.blue.100')};
   }
 
-  .joint::before {
-    background-color: ${tw.theme('colors.white')};
-  }
-  .joint::after {
+  .joint {
     background-color: ${tw.theme('colors.gray.300')};
   }
-  .joint-hover::before {
-    background-color: ${tw.theme('colors.white')};
+  .joint-select-impacted {
+    background-color: ${tw.theme('colors.green.500')};
   }
-  .joint-hover::after {
+  .joint-select-changed {
     background-color: ${tw.theme('colors.blue.500')};
   }
-  .joint-hover-select::before {
-    background-color: ${tw.theme('colors.gray.100')};
+
+  .edge-select-impacted {
+    stroke-dasharray: 7;
+    stroke-linecap: round;
+    animation: edge-animation 70s linear infinite;
   }
-  .joint-hover-select::after {
-    background-color: ${tw.theme('colors.blue.500')};
+  @keyframes edge-animation {
+    0% {
+      stroke-dashoffset: 1000;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
   }
-  .joint-select::before {
-    background-color: ${tw.theme('colors.blue.100')};
+  .edge-select-changed {
+    stroke-dasharray: 7;
+    stroke-linecap: round;
+    animation: edge-animation-changed 70s linear infinite;
   }
-  .joint-select::after {
-    background-color: ${tw.theme('colors.blue.500')};
+  @keyframes edge-animation-changed {
+    0% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 1000;
+    }
   }
 
   .sync-button-hover {
@@ -95,18 +110,18 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="declaration-template">
-        <li class="declaration flex items-center h-4">
-          <div class="joint-slot absolute -left-1"></div>
-          <p class="name text-gray-700 mx-3"></p>
+        <li class="declaration flex items-center h-6">
+          <div class="joint-slot absolute"></div>
+          <p class="name text-gray-700 w-full px-4"></p>
           <a target="_blank" class="link">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path></svg>
           </a>
-          <div class="joint-slot absolute right-1"></div>
+          <div class="joint-slot absolute right-0"></div>
         </li>
       </template>
 
       <template id="joint-template">
-        <div class="joint before:absolute before:w-4 before:h-4 before:-top-2 before:-left-1 before:rounded-full after:absolute after:w-2 after:h-2 after:-top-1 after:rounded-full"></div>
+        <div class="joint w-2 h-2 -top-1 mx-1 rounded-full"></div>
       </template>
     `;
 
@@ -118,26 +133,31 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.declarationTemplate = this.shadowRoot.querySelector('#declaration-template');
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
     this.declarations = new Map();
+    this.selectEntrypoint = '';
     this.selectEntrypointState = selectState.NORMAL;
+    this.selectDeclaration = '';
+    this.selectDeclarations = new Set();
     this.callbackStateChanged = () => {};
 
     const syncButton = this.shadowRoot.querySelector('#sync-button');
-    const onSelectSyncButton = () => {
+    const handleSelectSyncButton = () => {
       if (this.enableSync) {
         syncButton.classList.add('sync-button-select');
         this.callbackStateChanged(selectState.SELECT);
       } else {
+        this.unselectChanged();
         syncButton.classList.remove('sync-button-select');
-        for (const dec of this.declarations.values()) {
-          dec.closest('.file').classList.remove('ring-2');
-        }
+        requestAnimationFrame(() => {
+          this.edges.innerHTML = '';
+          this.renderEdges(this.graphs, this.declarations);
+        });
         this.callbackStateChanged(selectState.NORMAL);
       }
     };
-    onSelectSyncButton();
+    handleSelectSyncButton();
     syncButton.addEventListener('click', () => {
       this.enableSync = !this.enableSync;
-      onSelectSyncButton();
+      handleSelectSyncButton();
     });
     syncButton.addEventListener('mouseover', () => {
       syncButton.classList.add('sync-button-hover');
@@ -174,18 +194,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         return;
       }
 
-      const state = JSON.parse(newValue);
-      for (const dec of this.declarations.values()) {
-        dec.closest('.file').classList.remove('ring-2');
-      }
-      for (const [key, dec] of this.declarations) {
-        if (key.startsWith(state.didChange)) {
-          const file = dec.closest('.file');
-          file.classList.add('ring-2');
-          this.scrollTo(file.getBoundingClientRect().left, file.getBoundingClientRect().top);
-          break;
-        }
-      }
+      this.state = JSON.parse(newValue);
+      this.selectChanged();
+      this.scrollToDeclaration(this.selectDeclaration);
     }
     if (name === 'repourl') {
       this.repoUrl = newValue;
@@ -197,31 +208,69 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
     if (name === 'entrypointselect') {
       const obj = JSON.parse(newValue);
-      this.selectEntrypointState = obj.state;
-      this.selectEntrypoint = obj.posKey;
 
       for (const dec of this.declarations.values()) {
-        dec.classList.remove('declaration-hover', 'declaration-select');
+        dec.classList.remove('declaration-hover', 'declaration-select-impacted');
         dec.querySelectorAll('.joint')
-          .forEach((j) => j.classList.remove('joint-hover', 'joint-hover-select', 'joint-select'));
+          .forEach((j) => j.classList.remove(
+            'joint-select-impacted',
+            'joint-select-changed',
+            'joint-select',
+          ));
       }
-      switch (this.selectEntrypointState) {
+
+      switch (obj.state) {
+        case selectState.NORMAL:
+          if (this.selectEntrypointState === selectState.SELECT) {
+            for (const dec of this.declarations.values()) {
+              const file = dec.closest('.file');
+              file.classList.remove('ring-2');
+            }
+            if (this.enableSync || this.selectDeclaration) {
+              this.selectChanged();
+            }
+          }
+          break;
         case selectState.OVER:
-          this.declarations.get(this.selectEntrypoint).classList.add('declaration-hover');
-          this.declarations.get(this.selectEntrypoint)
-            .querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover-select'));
+          if (this.selectEntrypointState === selectState.SELECT) {
+            for (const dec of this.declarations.values()) {
+              const file = dec.closest('.file');
+              file.classList.remove('ring-2');
+            }
+            if (this.enableSync || this.selectDeclaration) {
+              this.selectChanged();
+            }
+          }
+
+          this.declarations.get(obj.posKey).classList.add('declaration-hover');
           break;
         case selectState.SELECT:
-          this.declarations.get(this.selectEntrypoint).classList.add('declaration-select');
-          this.declarations.get(this.selectEntrypoint)
-            .querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select'));
+          this.unselectChanged();
+
+          this.selectDeclarations = new Set();
+          this.declarations.get(obj.posKey).classList.add('declaration-select-impacted');
+          this.declarations.get(obj.posKey)
+            .querySelectorAll('.joint').forEach((j) => j.classList.add('join-select'));
+
+          this.scrollToDeclaration(obj.posKey);
+          for (const [key, dec] of this.declarations) {
+            if (key === obj.posKey) {
+              const file = dec.closest('.file');
+              file.classList.add('ring-2');
+              break;
+            }
+          }
           break;
         default:
       }
+
       requestAnimationFrame(() => {
         this.edges.innerHTML = '';
         this.renderEdges(this.graphs, this.declarations);
       });
+
+      this.selectEntrypointState = obj.state;
+      this.selectEntrypoint = obj.posKey;
     }
   }
 
@@ -326,19 +375,24 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       let selected = false;
       const parentKeys = [];
       for (const innerConn of graph.innerConnections) {
-        if (parentKey) {
-          selected = this.selectEntrypointState !== selectState.NORMAL
-            && parentKey === getPosKey(innerConn.entrypoint);
-        } else {
-          selected = this.selectEntrypointState !== selectState.NORMAL
-            && this.selectEntrypoint === getPosKey(innerConn.entrypoint);
+        if (this.selectEntrypoint) {
+          if (parentKey) {
+            selected = this.selectEntrypointState === selectState.SELECT
+              && parentKey === getPosKey(innerConn.entrypoint);
+          } else {
+            selected = this.selectEntrypointState === selectState.SELECT
+              && this.selectEntrypoint === getPosKey(innerConn.entrypoint);
+          }
         }
 
         for (const origin of innerConn.origins) {
           this.renderEdge(
             declarations.get(getPosKey(innerConn.entrypoint)),
             declarations.get(getPosKey(origin)),
-            selected,
+            this.selectDeclaration
+              ? this.selectDeclarations.has(getPosKey(innerConn.entrypoint))
+                && this.selectDeclarations.has(getPosKey(origin))
+              : selected,
           );
           if (getPosKey(innerConn.entrypoint) === this.selectEntrypoint) {
             parentKeys.push(getPosKey(origin));
@@ -352,7 +406,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
           this.renderEdge(
             declarations.get(getPosKey(conn.entrypoint)),
             declarations.get(getPosKey(conn.origin)),
-            selected,
+            this.selectDeclaration
+              ? this.selectDeclarations.has(getPosKey(conn.entrypoint))
+              : selected,
           );
 
           if (parentKeys.find((k) => k === getPosKey(conn.entrypoint))) {
@@ -371,10 +427,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
   renderEdge(dom1, dom2, selected) {
     const edge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    if (selected) {
-      dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover'));
-      dom2.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-hover'));
-    }
     const panelRect = this.panel.getBoundingClientRect();
     const dom1Rect = dom1.getBoundingClientRect();
     const dom2Rect = dom2.getBoundingClientRect();
@@ -383,10 +435,74 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     const x2 = dom2Rect.left - panelRect.left;
     const y2 = dom2Rect.top + (dom1Rect.height / 2) - panelRect.top;
     edge.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1} ${x2 - 20} ${y2} ${x2} ${y2}`);
-    edge.setAttribute('stroke', selected ? tw.theme('colors.blue.500') : tw.theme('colors.gray.300'));
+    if (selected) {
+      if (this.selectDeclaration) {
+        dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
+        dom2.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
+        edge.classList.add('edge-select-changed');
+        edge.setAttribute('stroke', tw.theme('colors.blue.600'));
+      } else {
+        dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
+        dom2.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
+        edge.classList.add('edge-select-impacted');
+        edge.setAttribute('stroke', tw.theme('colors.green.500'));
+      }
+    } else {
+      dom1.querySelectorAll('.joint')
+        .forEach((j) => j.classList.remove('joint-select-impacted', 'joint-select-changed'));
+      dom2.querySelectorAll('.joint')
+        .forEach((j) => j.classList.remove('joint-select-impacted', 'joint-select-changed'));
+      edge.setAttribute('stroke', tw.theme('colors.gray.300'));
+    }
     edge.setAttribute('fill', 'transparent');
     edge.setAttribute('stroke-width', selected ? '3' : '2');
     this.edges.appendChild(edge);
+  }
+
+  selectChanged() {
+    if (!this.state) {
+      return;
+    }
+
+    this.selectDeclaration = getPosKey(this.state.didChange);
+    this.selectDeclarations = findParentDeclarationKeys(this.state.didChange, this.graphs);
+    for (const [key, dec] of this.declarations) {
+      if (key === getPosKey(this.state.didChange)) {
+        dec.classList.add('declaration-select-changed');
+        const file = dec.closest('.file');
+        file.classList.add('ring-2');
+        file.querySelectorAll('.joint').forEach((j) => j.classList.add('join-select-changed'));
+        break;
+      }
+    }
+
+    requestAnimationFrame(() => {
+      this.edges.innerHTML = '';
+      this.renderEdges(this.graphs, this.declarations);
+    });
+  }
+
+  unselectChanged() {
+    this.selectDeclaration = '';
+
+    for (const dec of this.declarations.values()) {
+      dec.classList.remove('declaration-select-changed');
+      const file = dec.closest('.file');
+      file.classList.remove('ring-2');
+    }
+  }
+
+  scrollToDeclaration(targetKey) {
+    for (const [key, dec] of this.declarations) {
+      if (key === targetKey) {
+        const panelRect = this.panel.getBoundingClientRect();
+        this.scrollTo(
+          dec.getBoundingClientRect().left - panelRect.left,
+          dec.getBoundingClientRect().top - panelRect.top,
+        );
+        break;
+      }
+    }
   }
 }
 
