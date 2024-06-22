@@ -26,7 +26,7 @@ if [ $1 = "pr-report" ]; then
   gh pr comment --body "$PR_COMMENT" --edit-last || gh pr comment --body "$PR_COMMENT"
 elif [ $1 = "html-report" ]; then
   (cd $HOME_DIR && ls -lsa && npm run build \
-    --ingapath=./inga/report/report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} \
+    --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} \
     --inganumber=${PR_NUMBER} -- --base=${BASE})
   cp -r $HOME_DIR/inga-report .
 else
