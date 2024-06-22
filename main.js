@@ -119,7 +119,7 @@ async function digest(msg) {
 }
 
 async function initLoad() {
-  if (repoUrl.length > 0) {
+  if (repoUrl.length === 0) {
     report = await loadReport();
   }
   reportHash = await digest(JSON.stringify(report));
@@ -135,7 +135,7 @@ async function initLoad() {
 
 initLoad();
 
-if (repoUrl.length > 0) {
+if (repoUrl.length === 0) {
   setInterval(async () => {
     const reportObj = await loadReport();
     const newReportHash = await digest(JSON.stringify(reportObj));
