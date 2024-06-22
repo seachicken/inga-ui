@@ -119,7 +119,9 @@ async function digest(msg) {
 }
 
 async function initLoad() {
-  report = await loadReport();
+  if (repoUrl.length === 0) {
+    report = await loadReport();
+  }
   reportHash = await digest(JSON.stringify(report));
   reload(report);
 
@@ -133,30 +135,32 @@ async function initLoad() {
 
 initLoad();
 
-setInterval(async () => {
-  const reportObj = await loadReport();
-  const newReportHash = await digest(JSON.stringify(reportObj));
-  if (newReportHash !== reportHash) {
-    report = reportObj;
-    reportHash = newReportHash;
-    if (enableSync) {
-      reload(report);
-      document.querySelector('#refresh-button').classList.add('hidden');
-      state = {};
-      stateHash = '';
-    } else {
-      document.querySelector('#refresh-button').classList.remove('hidden');
+if (repoUrl.length === 0) {
+  setInterval(async () => {
+    const reportObj = await loadReport();
+    const newReportHash = await digest(JSON.stringify(reportObj));
+    if (newReportHash !== reportHash) {
+      report = reportObj;
+      reportHash = newReportHash;
+      if (enableSync) {
+        reload(report);
+        document.querySelector('#refresh-button').classList.add('hidden');
+        state = {};
+        stateHash = '';
+      } else {
+        document.querySelector('#refresh-button').classList.remove('hidden');
+      }
     }
-  }
 
-  if (enableSync) {
-    const stateObj = await loadState();
-    const newStateHash = await digest(JSON.stringify(stateObj));
-    if (newStateHash !== stateHash) {
-      state = stateObj;
-      stateHash = newStateHash;
-      document.querySelector('#service-graph')
-        .setAttribute('state', JSON.stringify(state));
+    if (enableSync) {
+      const stateObj = await loadState();
+      const newStateHash = await digest(JSON.stringify(stateObj));
+      if (newStateHash !== stateHash) {
+        state = stateObj;
+        stateHash = newStateHash;
+        document.querySelector('#service-graph')
+          .setAttribute('state', JSON.stringify(state));
+      }
     }
-  }
-}, 5000);
+  }, 5000);
+}

@@ -197,6 +197,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
     if (name === 'repourl') {
       this.repoUrl = newValue;
+      if (this.repoUrl) {
+        this.shadowRoot.querySelector('#sync-button').classList.add('hidden');
+      }
       this.render();
     }
     if (name === 'prnumber') {
