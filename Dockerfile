@@ -10,11 +10,9 @@ RUN npm install && \
 
 FROM busybox:1.36
 
-ENV SERVER_PORT=8080
-
 WORKDIR /html
 
 COPY --from=build /app/inga-report /html
 
-CMD ["httpd", "-f", "-p", "$SERVER_PORT", "-h", "/html"]
+ENTRYPOINT ["httpd", "-f", "-h", "/html", "-p"]
 
