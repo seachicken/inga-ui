@@ -365,6 +365,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       for (const jointSlot of declaration.querySelectorAll('.joint-slot')) {
         const jointRoot = document.importNode(this.jointTemplate.content, true);
         const joint = jointRoot.querySelector('.joint');
+        joint.classList.add('hidden');
         jointSlot.appendChild(joint);
       }
 
@@ -437,6 +438,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     const x2 = dom2Rect.left - panelRect.left;
     const y2 = dom2Rect.top + (dom1Rect.height / 2) - panelRect.top;
     edge.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1} ${x2 - 20} ${y2} ${x2} ${y2}`);
+    dom1.querySelectorAll('.joint')[1].classList.remove('hidden');
+    dom2.querySelectorAll('.joint')[0].classList.remove('hidden');
     if (selected) {
       if (this.selectDeclaration) {
         dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
