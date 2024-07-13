@@ -10,7 +10,7 @@ RUN npm install && \
 
 FROM busybox:1.36
 
-ARG SERVER_PORT=8080
+ENV SERVER_PORT=8080
 
 WORKDIR /html
 
