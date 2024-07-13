@@ -28,7 +28,7 @@ elif [ $1 = "html-report" ]; then
   (cd $HOME_DIR && npm run build \
     --ingapath=./report.json --ingaurl=${GITHUB_URL} --ingasha=${HEAD_SHA} \
     --inganumber=${PR_NUMBER} -- --base=${BASE})
-  cp -r $HOME_DIR/inga-report .
+  cp -r $HOME_DIR/dist .
 else
   echo "command is required" >&2
   exit 1

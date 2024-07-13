@@ -12,7 +12,7 @@ FROM busybox:1.36
 
 WORKDIR /html
 
-COPY --from=build /app/inga-report .
+COPY --from=build /app/dist .
 
 ENTRYPOINT ["httpd", "-f", "-h", "/html", "-p"]
 CMD ["8080"]
