@@ -488,6 +488,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     for (const dec of this.declarations.values()) {
       dec.classList.remove('declaration-select-changed');
+      dec.querySelectorAll('.joint')
+        .forEach((j) => j.classList.remove(
+          'joint-select-impacted',
+          'joint-select-changed',
+          'joint-select',
+        ));
       const file = dec.closest('.file');
       file.classList.remove('ring-2');
     }
