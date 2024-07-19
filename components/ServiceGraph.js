@@ -453,10 +453,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         edge.setAttribute('stroke', tw.theme('colors.green.500'));
       }
     } else {
-      dom1.querySelectorAll('.joint')
-        .forEach((j) => j.classList.remove('joint-select-impacted', 'joint-select-changed'));
-      dom2.querySelectorAll('.joint')
-        .forEach((j) => j.classList.remove('joint-select-impacted', 'joint-select-changed'));
       edge.setAttribute('stroke', tw.theme('colors.gray.300'));
     }
     edge.setAttribute('fill', 'transparent');
@@ -492,6 +488,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     for (const dec of this.declarations.values()) {
       dec.classList.remove('declaration-select-changed');
+      dec.querySelectorAll('.joint')
+        .forEach((j) => j.classList.remove(
+          'joint-select-impacted',
+          'joint-select-changed',
+          'joint-select',
+        ));
       const file = dec.closest('.file');
       file.classList.remove('ring-2');
     }
