@@ -29,7 +29,7 @@ let selectedFileIndex = 0;
 let enableSync = false;
 
 async function loadReport() {
-  const response = await fetch('report/report.json');
+  const response = await fetch('report/report.json', { cache: 'no-cache' });
   if (!response.ok) {
     return [];
   }
@@ -37,7 +37,7 @@ async function loadReport() {
 }
 
 async function loadState() {
-  const response = await fetch('report/state.json');
+  const response = await fetch('report/state.json', { cache: 'no-cache' });
   if (!response.ok) {
     return {};
   }
