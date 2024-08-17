@@ -10,10 +10,12 @@ RUN npm install && \
 
 FROM busybox:1.36
 
+STOPSIGNAL SIGTERM
+
 WORKDIR /html
 
 COPY --from=build /app/inga-report .
 
-ENTRYPOINT ["exec", "httpd", "-f", "-h", "/html", "-p"]
+ENTRYPOINT ["httpd", "-f", "-h", "/html", "-p"]
 CMD ["8080"]
 
