@@ -14,6 +14,6 @@ WORKDIR /html
 
 COPY --from=build /app/inga-report .
 
-ENTRYPOINT ["httpd", "-f", "-h", "/html", "-p"]
+ENTRYPOINT ["exec", "httpd", "-f", "-h", "/html", "-p"]
 CMD ["8080"]
 
