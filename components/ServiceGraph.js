@@ -21,8 +21,23 @@ sheet.target.replaceSync(`
     background-color: ${tw.theme('colors.blue.100')};
   }
 
-  .joint {
-    background-color: ${tw.theme('colors.gray.300')};
+  .joint-searching {
+    width: 8px;
+    stroke: ${tw.theme('colors.blue.500')};
+  }
+  .joint-searching-path {
+    stroke-width: 30px;
+    stroke-dasharray: 1000;
+    stroke-linecap: round;
+    animation: joint-searching-animation 1s linear infinite;
+  }
+  @keyframes joint-searching-animation {
+    0% {
+      stroke-dashoffset: 1000;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
   }
   .joint-select-impacted {
     background-color: ${tw.theme('colors.green.500')};
@@ -108,17 +123,20 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
       <template id="declaration-template">
         <li class="declaration flex items-center h-6">
-          <div class="joint-slot absolute"></div>
+          <div class="joint-slot absolute left-1"></div>
           <p class="name w-full px-4"></p>
           <a target="_blank" class="link">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path></svg>
           </a>
-          <div class="joint-slot absolute right-0"></div>
+          <div class="joint-slot absolute right-1"></div>
         </li>
       </template>
 
       <template id="joint-template">
-        <div class="joint w-2 h-2 -top-1 mx-1 rounded-full"></div>
+        <div class="joint flex items-center justify-center w-100 h-100 -top-1 mx-1">
+          <div class="absolute w-2 h-2 rounded-full bg-gray-300"></div>
+          <svg class="joint-searching absolute fill-none overflow-visible" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle class="joint-searching-path" cx="50" cy="50" r="50" /></svg>
+        </div>
       </template>
     `;
 
@@ -177,13 +195,17 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   static get observedAttributes() {
-    return ['src', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
+    return ['src', 'searchingkeys', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'src') {
       this.graphs = JSON.parse(newValue);
       this.filesChangedPoss = findLeafPoss(this.graphs);
+      this.render();
+    }
+    if (name === 'searchingkeys') {
+      this.searchingKeys = JSON.parse(newValue);
       this.render();
     }
     if (name === 'state') {
@@ -283,6 +305,14 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       this.edges.innerHTML = '';
       this.renderEdges(this.graphs, this.declarations);
     });
+
+    for (const dec of this.declarations.values()) {
+      dec.querySelectorAll('.joint-searching')
+        .forEach((j) => j.classList.add('hidden'));
+    }
+    for (const key of this.searchingKeys) {
+      this.declarations.get(key).querySelector('.joint-searching').classList.remove('hidden');
+    }
   }
 
   renderGraph(graph, i, depth = 0) {
