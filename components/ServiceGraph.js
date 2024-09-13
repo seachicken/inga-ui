@@ -310,8 +310,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       dec.querySelectorAll('.joint-searching')
         .forEach((j) => j.classList.add('hidden'));
     }
-    for (const key of this.searchingKeys) {
-      this.declarations.get(key).querySelector('.joint-searching').classList.remove('hidden');
+    for (const key of this.searchingKeys || []) {
+      if (this.declarations.has(key)) {
+        this.declarations.get(key).querySelector('.joint-searching').classList.remove('hidden');
+      }
     }
   }
 
@@ -344,6 +346,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.nodes.appendChild(service);
 
     const filePossIn = getFilePoss(graph.innerConnections
+      .filter((c) => c.entrypoint)
       .map((c) => ({ entrypoint: c.entrypoint })))
       .filter((p) => p.type === fileType.FILE);
     for (const filePosIn of filePossIn) {
@@ -460,25 +463,27 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
   renderEdge(dom1, dom2, selected) {
     const edge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const panelRect = this.panel.getBoundingClientRect();
-    const dom1Rect = dom1.getBoundingClientRect();
-    const dom2Rect = dom2.getBoundingClientRect();
-    const x1 = dom1Rect.right - panelRect.left;
-    const y1 = dom1Rect.top + (dom2Rect.height / 2) - panelRect.top;
-    const x2 = dom2Rect.left - panelRect.left;
-    const y2 = dom2Rect.top + (dom1Rect.height / 2) - panelRect.top;
-    edge.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1} ${x2 - 20} ${y2} ${x2} ${y2}`);
-    dom1.querySelectorAll('.joint')[1].classList.remove('hidden');
-    dom2.querySelectorAll('.joint')[0].classList.remove('hidden');
+    if (dom1 && dom2) {
+      const panelRect = this.panel.getBoundingClientRect();
+      const dom1Rect = dom1.getBoundingClientRect();
+      const dom2Rect = dom2.getBoundingClientRect();
+      const x1 = dom1Rect.right - panelRect.left;
+      const y1 = dom1Rect.top + (dom2Rect.height / 2) - panelRect.top;
+      const x2 = dom2Rect.left - panelRect.left;
+      const y2 = dom2Rect.top + (dom1Rect.height / 2) - panelRect.top;
+      edge.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1} ${x2 - 20} ${y2} ${x2} ${y2}`);
+    }
+    dom1?.querySelectorAll('.joint')[1].classList.remove('hidden');
+    dom2?.querySelectorAll('.joint')[0].classList.remove('hidden');
     if (selected) {
       if (this.selectDeclaration) {
-        dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
-        dom2.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
+        dom1?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
+        dom2?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
         edge.classList.add('edge-select-changed');
         edge.setAttribute('stroke', tw.theme('colors.blue.600'));
       } else {
-        dom1.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
-        dom2.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
+        dom1?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
+        dom2?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
         edge.classList.add('edge-select-impacted');
         edge.setAttribute('stroke', tw.theme('colors.green.500'));
       }
