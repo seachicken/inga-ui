@@ -39,6 +39,9 @@ sheet.target.replaceSync(`
       stroke-dashoffset: 0;
     }
   }
+  .joint-normal {
+    background-color: ${tw.theme('colors.gray.300')};
+  }
   .joint-select-impacted {
     background-color: ${tw.theme('colors.green.500')};
   }
@@ -134,7 +137,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
       <template id="joint-template">
         <div class="joint flex items-center justify-center w-100 h-100 -top-1 mx-1">
-          <div class="absolute w-2 h-2 rounded-full bg-gray-300"></div>
+          <div class="joint-inner absolute w-2 h-2 rounded-full"></div>
           <svg class="joint-searching absolute fill-none overflow-visible" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle class="joint-searching-path" cx="50" cy="50" r="50" /></svg>
         </div>
       </template>
@@ -233,11 +236,11 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
       for (const dec of this.declarations.values()) {
         dec.classList.remove('declaration-hover', 'declaration-select-impacted');
-        dec.querySelectorAll('.joint')
+        dec.querySelectorAll('.joint-inner')
           .forEach((j) => j.classList.remove(
+            'joint-normal',
             'joint-select-impacted',
             'joint-select-changed',
-            'joint-select',
           ));
       }
 
@@ -477,17 +480,19 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     dom2?.querySelectorAll('.joint')[0].classList.remove('hidden');
     if (selected) {
       if (this.selectDeclaration) {
-        dom1?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
-        dom2?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-changed'));
+        dom1?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-select-changed'));
+        dom2?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-select-changed'));
         edge.classList.add('edge-select-changed');
         edge.setAttribute('stroke', tw.theme('colors.blue.600'));
       } else {
-        dom1?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
-        dom2?.querySelectorAll('.joint').forEach((j) => j.classList.add('joint-select-impacted'));
+        dom1?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-select-impacted'));
+        dom2?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-select-impacted'));
         edge.classList.add('edge-select-impacted');
         edge.setAttribute('stroke', tw.theme('colors.green.500'));
       }
     } else {
+      dom1?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-normal'));
+      dom2?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-normal'));
       edge.setAttribute('stroke', tw.theme('colors.gray.300'));
     }
     edge.setAttribute('fill', 'transparent');
@@ -523,11 +528,11 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     for (const dec of this.declarations.values()) {
       dec.classList.remove('declaration-select-changed');
-      dec.querySelectorAll('.joint')
+      dec.querySelectorAll('.joint-inner')
         .forEach((j) => j.classList.remove(
+          'joint-normal',
           'joint-select-impacted',
           'joint-select-changed',
-          'joint-select',
         ));
       const file = dec.closest('.file');
       file.classList.remove('ring-2');
