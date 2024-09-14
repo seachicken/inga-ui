@@ -22,11 +22,12 @@ sheet.target.replaceSync(`
   }
 
   .joint-searching {
-    width: 8px;
-    stroke: ${tw.theme('colors.blue.500')};
+    width: 10px;
+    stroke: ${tw.theme('colors.blue.400')};
+    transform: rotate(-90deg);
   }
   .joint-searching-path {
-    stroke-width: 30px;
+    stroke-width: 20px;
     stroke-dasharray: 1000;
     stroke-linecap: round;
     animation: joint-searching-animation 1s linear infinite;
@@ -137,7 +138,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
       <template id="joint-template">
         <div class="joint flex items-center justify-center w-100 h-100 -top-1 mx-1">
-          <div class="joint-inner absolute w-2 h-2 rounded-full"></div>
+          <div class="joint-inner absolute w-1.5 h-1.5 rounded-full"></div>
           <svg class="joint-searching absolute fill-none overflow-visible" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle class="joint-searching-path" cx="50" cy="50" r="50" /></svg>
         </div>
       </template>
