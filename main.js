@@ -44,6 +44,10 @@ async function loadState() {
   return response.json();
 }
 
+function filterSearchingKeys(poss) {
+  return poss.filter((r) => r.type === 'searching').map((r) => getPosKey(r.origin));
+}
+
 function reload(poss) {
   entrypointTree = getFilePoss(poss.filter((p) => p.type === 'entrypoint'));
   graphs = create(poss);
@@ -64,7 +68,7 @@ function reload(poss) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
