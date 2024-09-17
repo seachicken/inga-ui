@@ -218,6 +218,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       }
 
       this.state = JSON.parse(newValue);
+      this.unselectChanged();
       this.selectChanged();
       this.scrollToDeclaration(this.selectDeclaration);
     }
