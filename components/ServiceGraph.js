@@ -272,11 +272,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
           break;
         case selectState.SELECT:
           this.unselectChanged();
-
           this.selectDeclarations = new Set();
           this.declarations.get(obj.posKey).classList.add('declaration-select-impacted');
-          this.declarations.get(obj.posKey)
-            .querySelectorAll('.joint').forEach((j) => j.classList.add('join-select'));
 
           this.scrollToDeclaration(obj.posKey);
           for (const [key, dec] of this.declarations) {
@@ -513,7 +510,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         dec.classList.add('declaration-select-changed');
         const file = dec.closest('.file');
         file.classList.add('ring-2');
-        file.querySelectorAll('.joint').forEach((j) => j.classList.add('join-select-changed'));
         break;
       }
     }
