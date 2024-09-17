@@ -204,6 +204,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'src') {
+      this.unselectChanged();
       this.graphs = JSON.parse(newValue);
       this.filesChangedPoss = findLeafPoss(this.graphs);
       this.render();
@@ -274,7 +275,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
           this.unselectChanged();
           this.selectDeclarations = new Set();
           this.declarations.get(obj.posKey).classList.add('declaration-select-impacted');
-
           this.scrollToDeclaration(obj.posKey);
           for (const [key, dec] of this.declarations) {
             if (key === obj.posKey) {
