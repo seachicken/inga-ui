@@ -8,7 +8,7 @@ export const groupKey = {
   ORIGIN: 2,
 };
 
-export function getFilePoss(reportedPoss, key = groupKey.ENTRYPOINT) {
+function getFilePoss(reportedPoss, key = groupKey.ENTRYPOINT) {
   let sortedPoss = groupByKey(reportedPoss, key);
   sortedPoss = sortByAlphabet(sortedPoss);
   sortedPoss = groupByFile(sortedPoss);
@@ -89,7 +89,7 @@ export function getFilePoss(reportedPoss, key = groupKey.ENTRYPOINT) {
   return results;
 }
 
-export function groupBySubdirctories(dirsList) {
+function groupBySubdirctories(dirsList) {
   const results = [];
 
   for (let targetIdx = 0; targetIdx < dirsList.length; targetIdx += 1) {
@@ -109,7 +109,7 @@ export function groupBySubdirctories(dirsList) {
   return results;
 }
 
-export function getMatchingLength(dirsList, idx) {
+function getMatchingLength(dirsList, idx) {
   let result = 0;
   const targetDirs = dirsList[idx];
   for (let i = 0; i < dirsList.length; i += 1) {
@@ -125,7 +125,7 @@ export function getMatchingLength(dirsList, idx) {
   return result;
 }
 
-export function getDuplicateLength(a, b) {
+function getDuplicateLength(a, b) {
   let len = 0;
   for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
     if (a[i] === b[i]) {
@@ -220,3 +220,10 @@ function equalsDeclaration(a, b) {
     && a.line === b.line
     && a.offset === b.offset;
 }
+
+export default {
+  getFilePoss,
+  groupBySubdirctories,
+  getMatchingLength,
+  getDuplicateLength,
+};

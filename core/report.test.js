@@ -1,10 +1,10 @@
 import assert from 'node:assert';
 import { test } from 'node:test';
-import { print } from './report.js';
+import report from './report.js';
 
 test('print PR comment', () => {
   assert.deepStrictEqual(
-    print('./data/report.json', 'https://github.com/owner/repo', 'sha'),
+    report.print('./data/report.json', 'https://github.com/owner/repo', 'sha'),
     `# Inga Report
 
 **2 entory points affected by the change** (powered by [Inga](https://github.com/seachicken/inga))

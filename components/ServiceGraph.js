@@ -1,9 +1,9 @@
 import { cssomSheet, tw } from 'twind';
 import install from '@twind/with-web-components';
 import config from '../twind.config';
-import { findLeafPoss, findParentDeclarationKeys, getPosKey } from '../core/graph.js';
+import graph from '../core/graph.js';
 import { selectState } from '../core/state.js';
-import { fileType, getFilePoss, groupKey } from '../core/sort.js';
+import sort, { fileType, groupKey } from '../core/sort.js';
 
 const withTwind = install(config);
 const sheet = cssomSheet({ target: new CSSStyleSheet() });
@@ -205,7 +205,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'src') {
       this.graphs = JSON.parse(newValue);
-      this.filesChangedPoss = findLeafPoss(this.graphs);
+      this.filesChangedPoss = graph.findLeafPoss(this.graphs);
       this.render();
     }
     if (name === 'searchingkeys') {
@@ -319,12 +319,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
   }
 
-  renderGraph(graph, i, depth = 0) {
+  renderGraph(g, i, depth = 0) {
     const serviceRoot = document.importNode(this.serviceTemplate.content, true);
     const service = serviceRoot.querySelector('.service');
     service.style.left = `${depth * 430}px`;
     service.style.top = `${i * 150}px`;
-    service.querySelector('.name').innerHTML = graph.service;
+    service.querySelector('.name').innerHTML = g.service;
 
     service.addEventListener('mousedown', (e) => {
       const panelRect = this.panel.getBoundingClientRect();
@@ -347,7 +347,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     this.nodes.appendChild(service);
 
-    const filePossIn = getFilePoss(graph.innerConnections
+    const filePossIn = sort.getFilePoss(g.innerConnections
       .filter((c) => c.entrypoint)
       .map((c) => ({ entrypoint: c.entrypoint })))
       .filter((p) => p.type === fileType.FILE);
@@ -355,15 +355,15 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       this.renderFile(filePosIn, 0, 0, service.querySelector('.in'));
     }
 
-    const filePossOut = getFilePoss(graph.innerConnections
-      .flatMap((c) => c.origins.filter((o) => getPosKey(o) !== getPosKey(c.entrypoint)))
+    const filePossOut = sort.getFilePoss(g.innerConnections
+      .flatMap((c) => c.origins.filter((o) => graph.getPosKey(o) !== graph.getPosKey(c.entrypoint)))
       .map((p) => ({ origin: p })), groupKey.ORIGIN)
       .filter((p) => p.type === fileType.FILE);
     for (const filePosOut of filePossOut) {
       this.renderFile(filePosOut, 0, 0, service.querySelector('.out'));
     }
 
-    (graph.neighbours || [])
+    (g.neighbours || [])
       .forEach((c, ci) => c.neighbours.forEach((s) => this.renderGraph(s, ci, depth + 1)));
   }
 
@@ -375,7 +375,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     file.querySelector('.name').innerHTML = pos.path.split('/').pop();
 
     const fileChanged = pos.declarations
-      .find((d) => this.filesChangedPoss.find((p) => getPosKey(p) === getPosKey(d)));
+      .find((d) => this.filesChangedPoss.find((p) => graph.getPosKey(p) === graph.getPosKey(d)));
 
     parent.appendChild(file);
 
@@ -383,7 +383,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       const declarationRoot = document.importNode(this.declarationTemplate.content, true);
       const declaration = declarationRoot.querySelector('.declaration');
       declaration.querySelector('.name').innerHTML = dec.name;
-      if (this.filesChangedPoss.some((p) => getPosKey(p) === getPosKey(dec))) {
+      if (this.filesChangedPoss.some((p) => graph.getPosKey(p) === graph.getPosKey(dec))) {
         declaration.querySelector('.name').classList.add('text-blue-600');
       } else {
         declaration.querySelector('.name').classList.add('text-gray-700');
@@ -404,53 +404,53 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         jointSlot.appendChild(joint);
       }
 
-      this.declarations.set(getPosKey(dec), declaration);
+      this.declarations.set(graph.getPosKey(dec), declaration);
     }
   }
 
   renderEdges(graphs, declarations, parentKey = null) {
-    for (const graph of graphs) {
+    for (const g of graphs) {
       let selected = false;
       const parentKeys = [];
-      for (const innerConn of graph.innerConnections) {
+      for (const innerConn of g.innerConnections) {
         if (this.selectEntrypoint) {
           if (parentKey) {
             selected = this.selectEntrypointState === selectState.SELECT
-              && parentKey === getPosKey(innerConn.entrypoint);
+              && parentKey === graph.getPosKey(innerConn.entrypoint);
           } else {
             selected = this.selectEntrypointState === selectState.SELECT
-              && this.selectEntrypoint === getPosKey(innerConn.entrypoint);
+              && this.selectEntrypoint === graph.getPosKey(innerConn.entrypoint);
           }
         }
 
         for (const origin of innerConn.origins) {
           this.renderEdge(
-            declarations.get(getPosKey(innerConn.entrypoint)),
-            declarations.get(getPosKey(origin)),
+            declarations.get(graph.getPosKey(innerConn.entrypoint)),
+            declarations.get(graph.getPosKey(origin)),
             this.selectDeclaration
-              ? this.selectDeclarations.has(getPosKey(innerConn.entrypoint))
-                && this.selectDeclarations.has(getPosKey(origin))
+              ? this.selectDeclarations.has(graph.getPosKey(innerConn.entrypoint))
+                && this.selectDeclarations.has(graph.getPosKey(origin))
               : selected,
           );
-          if (getPosKey(innerConn.entrypoint) === this.selectEntrypoint) {
-            parentKeys.push(getPosKey(origin));
+          if (graph.getPosKey(innerConn.entrypoint) === this.selectEntrypoint) {
+            parentKeys.push(graph.getPosKey(origin));
           }
         }
       }
 
-      for (const connection of graph.neighbours || []) {
+      for (const connection of g.neighbours || []) {
         let newParentKey = null;
         for (const conn of connection.innerConnections) {
           this.renderEdge(
-            declarations.get(getPosKey(conn.entrypoint)),
-            declarations.get(getPosKey(conn.origin)),
+            declarations.get(graph.getPosKey(conn.entrypoint)),
+            declarations.get(graph.getPosKey(conn.origin)),
             this.selectDeclaration
-              ? this.selectDeclarations.has(getPosKey(conn.entrypoint))
+              ? this.selectDeclarations.has(graph.getPosKey(conn.entrypoint))
               : selected,
           );
 
-          if (parentKeys.find((k) => k === getPosKey(conn.entrypoint))) {
-            newParentKey = getPosKey(conn.origin);
+          if (parentKeys.find((k) => k === graph.getPosKey(conn.entrypoint))) {
+            newParentKey = graph.getPosKey(conn.origin);
           }
         }
 
@@ -504,10 +504,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       return;
     }
 
-    this.selectDeclaration = getPosKey(this.state.didChange);
-    this.selectDeclarations = findParentDeclarationKeys(this.state.didChange, this.graphs);
+    this.selectDeclaration = graph.getPosKey(this.state.didChange);
+    this.selectDeclarations = graph.findParentDeclarationKeys(this.state.didChange, this.graphs);
     for (const [key, dec] of this.declarations) {
-      if (key === getPosKey(this.state.didChange)) {
+      if (key === graph.getPosKey(this.state.didChange)) {
         dec.classList.add('declaration-select-changed');
         const file = dec.closest('.file');
         file.classList.add('ring-2');

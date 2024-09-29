@@ -1,12 +1,9 @@
 import fs from 'fs';
-import {
-  fileType,
-  getFilePoss,
-} from './sort.js';
+import sort, { fileType } from './sort.js';
 
-export function print(jsonPath, repoUrl, sha) {
+function print(jsonPath, repoUrl, sha) {
   const report = fs.readFileSync(jsonPath);
-  const files = getFilePoss(JSON.parse(report));
+  const files = sort.getFilePoss(JSON.parse(report));
   return `# Inga Report
 
 **${printNumOfFiles(files)} affected by the change** (powered by [Inga](https://github.com/seachicken/inga))
@@ -45,3 +42,5 @@ function printFileTree(files, repoUrl, sha) {
 
   return result;
 }
+
+export default { print };

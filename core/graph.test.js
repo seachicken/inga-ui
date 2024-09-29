@@ -1,10 +1,10 @@
 import assert from 'node:assert';
 import { test } from 'node:test';
-import { create, findParentDeclarationKeys, findLeafPoss } from './graph.js';
+import graph from './graph.js';
 
 test('create graphs', () => {
   assert.deepStrictEqual(
-    create([
+    graph.create([
       {
         type: 'entrypoint',
         service: 'B',
@@ -91,7 +91,7 @@ test('create graphs', () => {
 
 test('create multiple graphs', () => {
   assert.deepStrictEqual(
-    create([
+    graph.create([
       {
         type: 'entrypoint',
         service: 'B',
@@ -152,7 +152,7 @@ test('create multiple graphs', () => {
 
 test('create graphs with a common parent', () => {
   assert.deepStrictEqual(
-    create([
+    graph.create([
       {
         type: 'entrypoint',
         service: 'B',
@@ -302,7 +302,7 @@ test('create graphs with a common parent', () => {
 
 test('create graphs with related and orphan declarations', () => {
   assert.deepStrictEqual(
-    create([
+    graph.create([
       {
         type: 'entrypoint',
         service: 'B',
@@ -407,9 +407,9 @@ test('create graphs with related and orphan declarations', () => {
   );
 });
 
-test('filter by files changed', () => {
+test('filter by files changed', { only: true }, () => {
   assert.deepStrictEqual(
-    findLeafPoss(create([
+    graph.findLeafPoss(graph.create([
       {
         type: 'entrypoint',
         service: 'B',
@@ -450,7 +450,7 @@ test('filter by files changed', () => {
 
 test('find parent declarations', { only: true }, () => {
   assert.deepStrictEqual(
-    findParentDeclarationKeys(
+    graph.findParentDeclarationKeys(
       {
         path: 'b/A.java', name: 'a', line: 1, offset: 1,
       },

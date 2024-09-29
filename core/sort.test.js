@@ -1,16 +1,10 @@
 import assert from 'node:assert';
 import { test } from 'node:test';
-import {
-  fileType,
-  getDuplicateLength,
-  getFilePoss,
-  getMatchingLength,
-  groupBySubdirctories,
-} from './sort.js';
+import sort, { fileType } from './sort.js';
 
 test('group by entrypoint', () => {
   assert.deepStrictEqual(
-    getFilePoss([
+    sort.getFilePoss([
       {
         entrypoint: {
           path: 'a/A.java', name: 'a', line: 1, offset: 1,
@@ -118,7 +112,7 @@ test('group by entrypoint', () => {
 
 test('sort with a root file and a file in directories', () => {
   assert.deepStrictEqual(
-    getFilePoss([
+    sort.getFilePoss([
       {
         entrypoint: {
           path: 'A.java', name: 'a', line: 1, offset: 1,
@@ -200,7 +194,7 @@ test('sort with a root file and a file in directories', () => {
 
 test('sort with multiple files in a directory', () => {
   assert.deepStrictEqual(
-    getFilePoss([
+    sort.getFilePoss([
       {
         entrypoint: {
           path: 'b/A.java', name: 'b', line: 2, offset: 1,
@@ -275,7 +269,7 @@ test('sort with multiple files in a directory', () => {
 
 test('sort with multiple files in nested directories', () => {
   assert.deepStrictEqual(
-    getFilePoss([
+    sort.getFilePoss([
       {
         entrypoint: {
           path: 'a/b/c/A.java', name: 'a', line: 1, offset: 1,
@@ -389,7 +383,7 @@ test('sort with multiple files in nested directories', () => {
 
 test('group by entrypoint with only entrypoint', () => {
   assert.deepStrictEqual(
-    getFilePoss([
+    sort.getFilePoss([
       {
         entrypoint: {
           path: 'a/A.java', name: 'a', line: 1, offset: 1,
@@ -434,7 +428,7 @@ test('group by entrypoint with only entrypoint', () => {
 
 test('group by subdirectories', () => {
   assert.deepStrictEqual(
-    groupBySubdirctories([
+    sort.groupBySubdirctories([
       ['a', 'b', 'c'],
       ['a', 'b', 'c'],
       ['a', 'b'],
@@ -450,7 +444,7 @@ test('group by subdirectories', () => {
 test('get matching subdirectories length', async (t) => {
   await t.test('with target index', () => {
     assert.deepStrictEqual(
-      getMatchingLength([
+      sort.getMatchingLength([
         ['a', 'b', 'c'],
         ['a', 'b'],
         ['b'],
@@ -461,7 +455,7 @@ test('get matching subdirectories length', async (t) => {
 
   await t.test('with partial match', () => {
     assert.deepStrictEqual(
-      getDuplicateLength(
+      sort.getDuplicateLength(
         ['a', 'b'],
         ['a'],
       ),
@@ -471,7 +465,7 @@ test('get matching subdirectories length', async (t) => {
 
   await t.test('with exact match', () => {
     assert.deepStrictEqual(
-      getDuplicateLength(
+      sort.getDuplicateLength(
         ['a', 'b'],
         ['a', 'b'],
       ),

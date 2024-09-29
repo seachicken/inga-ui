@@ -1,4 +1,4 @@
-export function create(reportedPoss) {
+function create(reportedPoss) {
   const entrypointConnections = new Map();
   for (const pos of reportedPoss) {
     if (pos.type !== 'connection') {
@@ -59,7 +59,7 @@ export function create(reportedPoss) {
   return findRootServiecs(services, originConnections).map((s) => toNode(s));
 }
 
-export function findLeafPoss(graphs) {
+function findLeafPoss(graphs) {
   const results = [];
   const q = [];
   q.push(...graphs);
@@ -75,7 +75,7 @@ export function findLeafPoss(graphs) {
   return results;
 }
 
-export function findParentDeclarationKeys(targetPos, graphs) {
+function findParentDeclarationKeys(targetPos, graphs) {
   const results = new Set();
   results.add(getPosKey(targetPos));
   findParentDeclarationKeysRecursive(targetPos, graphs).forEach((d) => results.add(d));
@@ -147,9 +147,16 @@ function groupByEntrypoint(service) {
   }));
 }
 
-export function getPosKey(pos) {
+function getPosKey(pos) {
   if (!pos) {
     return null;
   }
   return `${pos.path}-${pos.name}-${pos.line}-${pos.offset}`;
 }
+
+export default {
+  create,
+  findLeafPoss,
+  findParentDeclarationKeys,
+  getPosKey,
+};

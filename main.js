@@ -3,11 +3,8 @@ import config from './twind.config';
 import FileTree from './components/FileTree.js';
 import ServiceGraph from './components/ServiceGraph.js';
 import TreeItem from './components/TreeItem.js';
-import { create, getPosKey } from './core/graph.js';
-import {
-  fileType,
-  getFilePoss,
-} from './core/sort.js';
+import graph from './core/graph.js';
+import sort, { fileType } from './core/sort.js';
 import { selectState } from './core/state.js';
 
 install(config);
@@ -45,12 +42,12 @@ async function loadState() {
 }
 
 function filterSearchingKeys(poss) {
-  return poss.filter((r) => r.type === 'searching').map((r) => getPosKey(r.origin));
+  return poss.filter((r) => r.type === 'searching').map((r) => graph.getPosKey(r.origin));
 }
 
 function reload(poss) {
-  entrypointTree = getFilePoss(poss.filter((p) => p.type === 'entrypoint'));
-  graphs = create(poss);
+  entrypointTree = sort.getFilePoss(poss.filter((p) => p.type === 'entrypoint'));
+  graphs = graph.create(poss);
   selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
   document.querySelector('#app').innerHTML = `
@@ -82,7 +79,7 @@ function reload(poss) {
       'entrypointselect',
       JSON.stringify({
         state: e.detail.state,
-        posKey: getPosKey(entrypointTree[e.detail.fileIndex]
+        posKey: graph.getPosKey(entrypointTree[e.detail.fileIndex]
           .declarations[e.detail.declarationIndex]),
       }),
     );
