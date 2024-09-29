@@ -448,7 +448,7 @@ test('filter by files changed', () => {
   );
 });
 
-test('find parent declarations', { only: true }, () => {
+test('find parent declarations', () => {
   assert.deepStrictEqual(
     graph.findParentDeclarationKeys(
       {
