@@ -407,7 +407,7 @@ test('create graphs with related and orphan declarations', () => {
   );
 });
 
-test('filter by files changed', { only: true }, () => {
+test('filter by files changed', () => {
   assert.deepStrictEqual(
     graph.findLeafPoss(graph.create([
       {
