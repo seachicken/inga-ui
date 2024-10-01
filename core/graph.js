@@ -36,9 +36,9 @@ function create(reportedPoss) {
   }
 
   for (const service of Array.from(services.values())) {
-    const originConns = service.poss
+    const entrypointConns = service.poss
       .flatMap((pos) => entrypointConnections.get(getPosKey(pos.origin)) || []);
-    for (const originConn of originConns) {
+    for (const originConn of entrypointConns) {
       if (service.neighbours) {
         service.neighbours.push(originConn);
       } else {
@@ -57,6 +57,87 @@ function create(reportedPoss) {
   }
 
   return findRootServiecs(services, originConnections).map((s) => toNode(s));
+}
+
+function merge(graphsByDefinition) {
+  let results = [];
+
+  function findSameNode(target, graphs) {
+    for (const graph of graphs || []) {
+      const aEntrypoints = new Set(target.innerConnections
+        .flatMap((c) => c.entrypoint).map((p) => getPosKey(p)));
+      const bEntrypoints = new Set(graph.innerConnections
+        .flatMap((c) => c.entrypoint).map((p) => getPosKey(p)));
+      const aOrigins = new Set(target.innerConnections
+        .flatMap((c) => (graph.type === 'connection' ? c.origin : c.origins))
+        .map((p) => getPosKey(p)));
+      const bOrigins = new Set(graph.innerConnections
+        .flatMap((c) => (graph.type === 'connection' ? c.origin : c.origins))
+        .map((p) => getPosKey(p)));
+      if ([...aEntrypoints].some((p) => bEntrypoints.has(p))
+          || [...aOrigins].some((p) => bOrigins.has(p))) {
+        return graph;
+      }
+      const node = findSameNode(target, graph.neighbours);
+      if (node) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  function mergeNode(a, b) {
+    if (a.type === 'connection') {
+      for (const aConn of a.innerConnections) {
+        const bConn = b.innerConnections
+          .find((c) => getPosKey(c.origin) === getPosKey(aConn.origin));
+        if (!bConn) {
+          b.innerConnections.push(aConn);
+        }
+      }
+    } else {
+      for (const aConn of a.innerConnections) {
+        const bConn = b.innerConnections
+          .find((c) => getPosKey(c.entrypoint) === getPosKey(aConn.entrypoint));
+        const bOrigins = new Set(bConn.origins.map((p) => getPosKey(p)));
+        for (const aOrigin of aConn.origins) {
+          if (!bOrigins.has(getPosKey(aOrigin))) {
+            bConn.origins.push(aOrigin);
+          }
+        }
+      }
+    }
+
+    for (const aNeighbour of a.neighbours) {
+      console.log(`find same node2`);
+      console.log(` a: ${JSON.stringify(aNeighbour)}`);
+      console.log(` b: ${JSON.stringify([b.neighbours])}`);
+      const sameNode = findSameNode(aNeighbour, b.neighbours);
+      if (sameNode) {
+        console.log(`sameNode2: ${JSON.stringify(sameNode)}`);
+        mergeNode(aNeighbour, sameNode);
+      } else if (b.neighbours) {
+        b.neighbours.push(aNeighbour);
+      } else {
+        b.neighbours = [aNeighbour];
+      }
+    }
+  }
+
+  for (const graphs of graphsByDefinition) {
+    for (const graph of graphs) {
+      const sameNode = findSameNode(graph, results);
+      if (sameNode) {
+        console.log(`sameNode: ${JSON.stringify(sameNode)}`);
+        mergeNode(graph, sameNode);
+      } else {
+        results = graphs;
+      }
+    }
+  }
+  console.log(`results: ${JSON.stringify(results, null, 2)}`);
+
+  return results;
 }
 
 function findLeafPoss(graphs) {
@@ -98,6 +179,7 @@ function findParentDeclarationKeysRecursive(targetPos, graphs) {
     }
     q.push(...graph.neighbours || []);
   }
+
   return results;
 }
 
@@ -156,6 +238,7 @@ function getPosKey(pos) {
 
 export default {
   create,
+  merge,
   findLeafPoss,
   findParentDeclarationKeys,
   getPosKey,

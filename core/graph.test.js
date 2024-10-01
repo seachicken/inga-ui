@@ -407,6 +407,190 @@ test('create graphs with related and orphan declarations', () => {
   );
 });
 
+test('merge same nodes', { only: true }, () => {
+  assert.deepStrictEqual(
+    graph.merge([
+      [
+        {
+          type: 'entrypoint',
+          service: 'A',
+          innerConnections: [
+            {
+              entrypoint: {
+                path: 'a/A.java', name: 'a', line: 1, offset: 1,
+              },
+              origins: [
+                {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+              ],
+            },
+          ],
+          neighbours: [
+            {
+              type: 'connection',
+              innerConnections: [
+                {
+                  entrypoint: {
+                    path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                  },
+                  origin: {
+                    path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                  },
+                },
+              ],
+              neighbours: [
+                {
+                  type: 'entrypoint',
+                  service: 'B',
+                  innerConnections: [
+                    {
+                      entrypoint: {
+                        path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                      },
+                      origins: [
+                        {
+                          path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      [
+        {
+          type: 'entrypoint',
+          service: 'A',
+          innerConnections: [
+            {
+              entrypoint: {
+                path: 'a/A.java', name: 'a', line: 1, offset: 1,
+              },
+              origins: [
+                {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+              ],
+            },
+          ],
+          neighbours: [
+            {
+              type: 'connection',
+              innerConnections: [
+                {
+                  entrypoint: {
+                    path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                  },
+                  origin: {
+                    path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                  },
+                },
+              ],
+              neighbours: [
+                {
+                  type: 'entrypoint',
+                  service: 'C',
+                  innerConnections: [
+                    {
+                      entrypoint: {
+                        path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                      },
+                      origins: [
+                        {
+                          path: 'c/B.java', name: 'a', line: 1, offset: 1,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    ]),
+    [
+      {
+        type: 'entrypoint',
+        service: 'A',
+        innerConnections: [
+          {
+            entrypoint: {
+              path: 'a/A.java', name: 'a', line: 1, offset: 1,
+            },
+            origins: [
+              {
+                path: 'a/B.java', name: 'a', line: 1, offset: 1,
+              },
+            ],
+          },
+        ],
+        neighbours: [
+          {
+            type: 'connection',
+            innerConnections: [
+              {
+                entrypoint: {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+                origin: {
+                  path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                },
+              },
+              {
+                entrypoint: {
+                  path: 'a/B.java', name: 'a', line: 1, offset: 1,
+                },
+                origin: {
+                  path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                },
+              },
+            ],
+            neighbours: [
+              {
+                type: 'entrypoint',
+                service: 'B',
+                innerConnections: [
+                  {
+                    entrypoint: {
+                      path: 'b/A.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'b/B.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: 'entrypoint',
+                service: 'C',
+                innerConnections: [
+                  {
+                    entrypoint: {
+                      path: 'c/A.java', name: 'a', line: 1, offset: 1,
+                    },
+                    origins: [
+                      {
+                        path: 'c/B.java', name: 'a', line: 1, offset: 1,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  );
+});
+
 test('filter by files changed', () => {
   assert.deepStrictEqual(
     graph.findLeafPoss(graph.create([
