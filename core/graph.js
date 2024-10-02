@@ -109,12 +109,8 @@ function merge(graphsByDefinition) {
     }
 
     for (const aNeighbour of a.neighbours) {
-      console.log(`find same node2`);
-      console.log(` a: ${JSON.stringify(aNeighbour)}`);
-      console.log(` b: ${JSON.stringify([b.neighbours])}`);
       const sameNode = findSameNode(aNeighbour, b.neighbours);
       if (sameNode) {
-        console.log(`sameNode2: ${JSON.stringify(sameNode)}`);
         mergeNode(aNeighbour, sameNode);
       } else if (b.neighbours) {
         b.neighbours.push(aNeighbour);
@@ -128,14 +124,12 @@ function merge(graphsByDefinition) {
     for (const graph of graphs) {
       const sameNode = findSameNode(graph, results);
       if (sameNode) {
-        console.log(`sameNode: ${JSON.stringify(sameNode)}`);
         mergeNode(graph, sameNode);
       } else {
         results = graphs;
       }
     }
   }
-  console.log(`results: ${JSON.stringify(results, null, 2)}`);
 
   return results;
 }

@@ -54,7 +54,10 @@ function reload(reportObj) {
   entrypointTree = sort.getFilePoss(results
     .flatMap((r) => r)
     .filter((p) => p.type === 'entrypoint'));
-  graphs = graph.merge(results.map((r) => graph.create(r)));
+  const graphsByDefinition = results.map((r) => graph.create(r));
+  const filesChangedKeys = new Set(graphsByDefinition
+    .flatMap((g) => graph.findLeafPoss(g).map((p) => graph.getPosKey(p))));
+  graphs = graph.merge(graphsByDefinition);
   selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
   document.querySelector('#app').innerHTML = `
@@ -72,7 +75,7 @@ function reload(reportObj) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 

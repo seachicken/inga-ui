@@ -151,6 +151,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.fileTemplate = this.shadowRoot.querySelector('#file-template');
     this.declarationTemplate = this.shadowRoot.querySelector('#declaration-template');
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
+    this.filesChangedKeys = [];
+    this.searchingKeys = [];
     this.declarations = new Map();
     this.selectEntrypoint = '';
     this.selectEntrypointState = selectState.NORMAL;
@@ -199,13 +201,16 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   static get observedAttributes() {
-    return ['src', 'searchingkeys', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
+    return ['src', 'fileschangedkeys', 'searchingkeys', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'src') {
       this.graphs = JSON.parse(newValue);
-      this.filesChangedPoss = graph.findLeafPoss(this.graphs);
+      this.render();
+    }
+    if (name === 'fileschangedkeys') {
+      this.filesChangedKeys = JSON.parse(newValue);
       this.render();
     }
     if (name === 'searchingkeys') {
@@ -312,7 +317,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       dec.querySelectorAll('.joint-searching')
         .forEach((j) => j.classList.add('hidden'));
     }
-    for (const key of this.searchingKeys || []) {
+    for (const key of this.searchingKeys) {
       if (this.declarations.has(key)) {
         this.declarations.get(key).querySelector('.joint-searching').classList.remove('hidden');
       }
@@ -375,7 +380,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     file.querySelector('.name').innerHTML = pos.path.split('/').pop();
 
     const fileChanged = pos.declarations
-      .find((d) => this.filesChangedPoss.find((p) => graph.getPosKey(p) === graph.getPosKey(d)));
+      .find((d) => this.filesChangedKeys.find((k) => k === graph.getPosKey(d)));
 
     parent.appendChild(file);
 
@@ -383,7 +388,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       const declarationRoot = document.importNode(this.declarationTemplate.content, true);
       const declaration = declarationRoot.querySelector('.declaration');
       declaration.querySelector('.name').innerHTML = dec.name;
-      if (this.filesChangedPoss.some((p) => graph.getPosKey(p) === graph.getPosKey(dec))) {
+      if (this.filesChangedKeys.some((k) => k === graph.getPosKey(dec))) {
         declaration.querySelector('.name').classList.add('text-blue-600');
       } else {
         declaration.querySelector('.name').classList.add('text-gray-700');
