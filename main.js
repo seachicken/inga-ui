@@ -13,6 +13,7 @@ window.customElements.define('file-tree', FileTree);
 window.customElements.define('service-graph', ServiceGraph);
 window.customElements.define('tree-item', TreeItem);
 
+const supportedReportVersion = '0.2';
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
@@ -41,13 +42,22 @@ async function loadState() {
   return response.json();
 }
 
-function filterSearchingKeys(poss) {
-  return poss.filter((r) => r.type === 'searching').map((r) => graph.getPosKey(r.origin));
+function filterSearchingKeys(reportObj) {
+  return reportObj.results
+    .flatMap((r) => r)
+    .filter((r) => r.type === 'searching')
+    .map((r) => graph.getPosKey(r.origin));
 }
 
-function reload(poss) {
-  entrypointTree = sort.getFilePoss(poss.filter((p) => p.type === 'entrypoint'));
-  graphs = graph.create(poss);
+function reload(reportObj) {
+  const results = (reportObj.version || '0.1') !== supportedReportVersion ? [] : reportObj.results;
+  entrypointTree = sort.getFilePoss(results
+    .flatMap((r) => r)
+    .filter((p) => p.type === 'entrypoint'));
+  const graphsByDefinition = results.map((r) => graph.create(r));
+  const filesChangedKeys = new Set(graphsByDefinition
+    .flatMap((g) => graph.findLeafPoss(g).map((p) => graph.getPosKey(p))));
+  graphs = graph.merge(graphsByDefinition);
   selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
   document.querySelector('#app').innerHTML = `
@@ -65,7 +75,7 @@ function reload(poss) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
