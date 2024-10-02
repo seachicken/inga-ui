@@ -126,7 +126,7 @@ function merge(graphsByDefinition) {
       if (sameNode) {
         mergeNode(graph, sameNode);
       } else {
-        results = graphs;
+        results = results.concat(graphs);
       }
     }
   }
