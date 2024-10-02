@@ -108,7 +108,7 @@ function merge(graphsByDefinition) {
       }
     }
 
-    for (const aNeighbour of a.neighbours) {
+    for (const aNeighbour of a.neighbours || []) {
       const sameNode = findSameNode(aNeighbour, b.neighbours);
       if (sameNode) {
         mergeNode(aNeighbour, sameNode);
