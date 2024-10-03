@@ -86,9 +86,7 @@ function merge(graphsByDefinition) {
     return null;
   }
 
-  function mergeNode(a, b) {
-    const source = a;
-    const target = b;
+  function mergeNode(source, target) {
     if (source.type === 'connection') {
       for (const sourceConn of source.innerConnections) {
         const targetConn = target.innerConnections
@@ -110,14 +108,14 @@ function merge(graphsByDefinition) {
       }
     }
 
-    for (const aNeighbour of a.neighbours || []) {
-      const sameNode = findSameNode(aNeighbour, target.neighbours);
+    for (const sourceNeighbour of source.neighbours || []) {
+      const sameNode = findSameNode(sourceNeighbour, target.neighbours);
       if (sameNode) {
-        mergeNode(aNeighbour, sameNode);
+        mergeNode(sourceNeighbour, sameNode);
       } else if (target.neighbours) {
-        target.neighbours.push(aNeighbour);
+        target.neighbours.push(sourceNeighbour);
       } else {
-        target.neighbours = [aNeighbour];
+        target.neighbours = [sourceNeighbour];
       }
     }
   }
