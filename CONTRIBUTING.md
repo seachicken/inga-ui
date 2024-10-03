@@ -11,10 +11,14 @@ If you find a security vulnerability, do NOT open an issue. Email lavish.hut.0z@
 
 - **nvm**: Install from [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating).
 
+```shell
+nvm use
+npm i
+```
+
 ### Run
 
 ```shell
-nvm use
 npm run dev --ingapath={report.json path}
 ```
 
