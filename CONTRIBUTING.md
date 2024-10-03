@@ -13,7 +13,7 @@ If you find a security vulnerability, do NOT open an issue. Email lavish.hut.0z@
 
 ```shell
 nvm use
-npm i
+npm install
 ```
 
 ### Run
