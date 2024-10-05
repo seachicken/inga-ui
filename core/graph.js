@@ -1,4 +1,5 @@
-function create(reportedPoss) {
+function create(reportedPossParam) {
+  const reportedPoss = structuredClone(reportedPossParam);
   const entrypointConnections = new Map();
   for (const pos of reportedPoss) {
     if (pos.type !== 'connection') {
@@ -38,20 +39,20 @@ function create(reportedPoss) {
   for (const service of Array.from(services.values())) {
     const entrypointConns = service.poss
       .flatMap((pos) => entrypointConnections.get(getPosKey(pos.origin)) || []);
-    for (const originConn of entrypointConns) {
+    for (const entrypointConn of entrypointConns) {
       if (service.neighbours) {
-        service.neighbours.push(originConn);
+        service.neighbours.push(entrypointConn);
       } else {
-        service.neighbours = [originConn];
+        service.neighbours = [entrypointConn];
       }
 
       const neighbourServices = Array.from(services.values())
         .filter((s) => s.poss
-          .find((pos) => getPosKey(pos.entrypoint) === getPosKey(originConn.origin)));
-      if (originConn.neighbours) {
-        originConn.neighbours.push(...neighbourServices);
+          .find((pos) => getPosKey(pos.entrypoint) === getPosKey(entrypointConn.origin)));
+      if (entrypointConn.neighbours) {
+        entrypointConn.neighbours.push(...neighbourServices);
       } else {
-        originConn.neighbours = neighbourServices;
+        entrypointConn.neighbours = neighbourServices;
       }
     }
   }
