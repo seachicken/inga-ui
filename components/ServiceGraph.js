@@ -352,18 +352,28 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     this.nodes.appendChild(service);
 
-    const filePossIn = sort.getFilePoss(g.innerConnections
-      .filter((c) => c.entrypoint)
-      .map((c) => ({ entrypoint: c.entrypoint })))
-      .filter((p) => p.type === fileType.FILE);
+    function isOut(target, conns) {
+      return conns
+        .some((c) => c.entrypoint.path !== target.path
+          && c.origins.some((o) => o.path === target.path));
+    }
+
+    const filePossIn = sort.getFilePoss(
+      g.innerConnections
+        .filter((c) => !isOut(c.entrypoint, g.innerConnections))
+        .map((c) => ({ entrypoint: c.entrypoint })),
+    ).filter((p) => p.type === fileType.FILE);
     for (const filePosIn of filePossIn) {
       this.renderFile(filePosIn, 0, 0, service.querySelector('.in'));
     }
 
-    const filePossOut = sort.getFilePoss(g.innerConnections
-      .flatMap((c) => c.origins.filter((o) => graph.getPosKey(o) !== graph.getPosKey(c.entrypoint)))
-      .map((p) => ({ origin: p })), groupKey.ORIGIN)
-      .filter((p) => p.type === fileType.FILE);
+    const filePossOut = sort.getFilePoss(
+      g.innerConnections
+        .flatMap((c) => c.origins)
+        .filter((p) => isOut(p, g.innerConnections))
+        .map((p) => ({ origin: p })),
+      groupKey.ORIGIN,
+    ).filter((p) => p.type === fileType.FILE);
     for (const filePosOut of filePossOut) {
       this.renderFile(filePosOut, 0, 0, service.querySelector('.out'));
     }
