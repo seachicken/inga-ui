@@ -353,8 +353,11 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.nodes.appendChild(service);
 
     function isOut(target, conns) {
+      if (!target) {
+        return true;
+      }
       return conns
-        .some((c) => c.entrypoint.path !== target.path
+        .some((c) => (!c.entrypoint || c.entrypoint.path !== target.path)
           && c.origins.some((o) => o.path === target.path));
     }
 
