@@ -22,7 +22,6 @@ let reportHash = '';
 let state = {};
 let stateHash = '';
 let entrypointTree = [];
-let graphs = [];
 let selectedFileIndex = 0;
 let enableSync = false;
 
@@ -51,13 +50,24 @@ function filterSearchingKeys(reportObj) {
 
 function reload(reportObj) {
   const results = (reportObj.version || '0.1') !== supportedReportVersion ? [] : reportObj.results;
-  entrypointTree = sort.getFilePoss(results
+
+  const uniqueKeys = new Set();
+  const flatResults = results
+    .flatMap((r) => r)
+    .filter((r) => {
+      const key = `${graph.getPosKey(r.entrypoint)}_${graph.getPosKey(r.origin)}`;
+      const isUnique = !uniqueKeys.has(key);
+      uniqueKeys.add(key);
+      return isUnique;
+    });
+
+  entrypointTree = sort.getFilePoss(flatResults
     .flatMap((r) => r)
     .filter((p) => p.type === 'entrypoint'));
   const graphsByDefinition = results.map((r) => graph.create(r));
   const filesChangedKeys = new Set(graphsByDefinition
     .flatMap((g) => graph.findLeafPoss(g).map((p) => graph.getPosKey(p))));
-  graphs = graph.merge(graphsByDefinition);
+  const graphs = graph.create(flatResults);
   selectedFileIndex = entrypointTree.findIndex((p) => p.type === fileType.FILE);
 
   document.querySelector('#app').innerHTML = `
