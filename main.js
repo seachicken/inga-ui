@@ -14,11 +14,14 @@ window.customElements.define('service-graph', ServiceGraph);
 window.customElements.define('tree-item', TreeItem);
 
 const supportedReportVersion = '0.2';
+const supportedReportErrorVersion = '0.1';
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
 let report = window.inga_report;
 let reportHash = '';
+let reportErrors = [];
+let reportErrorsHash = '';
 let state = {};
 let stateHash = '';
 let entrypointTree = [];
@@ -31,6 +34,18 @@ async function loadReport() {
     return [];
   }
   return response.json();
+}
+
+async function loadError() {
+  const response = await fetch('report/error.json', { cache: 'no-cache' });
+  if (!response.ok) {
+    return [];
+  }
+  const obj = await response.json();
+  if (obj.version !== supportedReportErrorVersion) {
+    return [];
+  }
+  return obj.errors;
 }
 
 async function loadState() {
@@ -85,7 +100,7 @@ function reload(reportObj) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportErrors)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
@@ -142,8 +157,10 @@ async function digest(msg) {
 async function initLoad() {
   if (repoUrl.length === 0) {
     report = await loadReport();
+    reportErrors = await loadError();
   }
   reportHash = await digest(JSON.stringify(report));
+  reportErrorsHash = await digest(JSON.stringify(reportErrors));
   reload(report);
 
   if (enableSync) {
@@ -174,6 +191,15 @@ if (repoUrl.length === 0) {
     }
 
     if (enableSync) {
+      const errorObj = await loadError();
+      const newReportErrorsHash = await digest(JSON.stringify(errorObj));
+      if (newReportErrorsHash !== reportErrorsHash) {
+        reportErrors = errorObj;
+        reportErrorsHash = newReportErrorsHash;
+        document.querySelector('#service-graph')
+          .setAttribute('errors', JSON.stringify(reportErrors));
+      }
+
       const stateObj = await loadState();
       const newStateHash = await digest(JSON.stringify(stateObj));
       if (newStateHash !== stateHash) {
