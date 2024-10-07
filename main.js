@@ -190,16 +190,16 @@ if (repoUrl.length === 0) {
       }
     }
 
-    if (enableSync) {
-      const errorObj = await loadError();
-      const newReportErrorsHash = await digest(JSON.stringify(errorObj));
-      if (newReportErrorsHash !== reportErrorsHash) {
-        reportErrors = errorObj;
-        reportErrorsHash = newReportErrorsHash;
-        document.querySelector('#service-graph')
-          .setAttribute('errors', JSON.stringify(reportErrors));
-      }
+    const errorObj = await loadError();
+    const newReportErrorsHash = await digest(JSON.stringify(errorObj));
+    if (newReportErrorsHash !== reportErrorsHash) {
+      reportErrors = errorObj;
+      reportErrorsHash = newReportErrorsHash;
+      document.querySelector('#service-graph')
+        .setAttribute('errors', JSON.stringify(reportErrors));
+    }
 
+    if (enableSync) {
       const stateObj = await loadState();
       const newStateHash = await digest(JSON.stringify(stateObj));
       if (newStateHash !== stateHash) {
