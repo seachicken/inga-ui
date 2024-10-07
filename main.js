@@ -20,8 +20,8 @@ const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
 let report = window.inga_report;
 let reportHash = '';
-let reportErrors = [];
-let reportErrorsHash = '';
+let reportError = {};
+let reportErrorHash = '';
 let state = {};
 let stateHash = '';
 let entrypointTree = [];
@@ -31,9 +31,13 @@ let enableSync = false;
 async function loadReport() {
   const response = await fetch('report/report.json', { cache: 'no-cache' });
   if (!response.ok) {
-    return [];
+    return {};
   }
-  return response.json();
+  const obj = await response.json();
+  if (obj.version !== supportedReportVersion) {
+    return {};
+  }
+  return obj;
 }
 
 async function loadError() {
@@ -45,7 +49,7 @@ async function loadError() {
   if (obj.version !== supportedReportErrorVersion) {
     return [];
   }
-  return obj.errors;
+  return obj;
 }
 
 async function loadState() {
@@ -64,10 +68,8 @@ function filterSearchingKeys(reportObj) {
 }
 
 function reload(reportObj) {
-  const results = (reportObj.version || '0.1') !== supportedReportVersion ? [] : reportObj.results;
-
   const uniqueKeys = new Set();
-  const flatResults = results
+  const flatResults = reportObj.results
     .flatMap((r) => r)
     .filter((r) => {
       const key = `${graph.getPosKey(r.entrypoint)}_${graph.getPosKey(r.origin)}`;
@@ -79,7 +81,7 @@ function reload(reportObj) {
   entrypointTree = sort.getFilePoss(flatResults
     .flatMap((r) => r)
     .filter((p) => p.type === 'entrypoint'));
-  const graphsByDefinition = results.map((r) => graph.create(r));
+  const graphsByDefinition = reportObj.results.map((r) => graph.create(r));
   const filesChangedKeys = new Set(graphsByDefinition
     .flatMap((g) => graph.findLeafPoss(g).map((p) => graph.getPosKey(p))));
   const graphs = graph.create(flatResults);
@@ -100,7 +102,7 @@ function reload(reportObj) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportErrors)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
@@ -157,10 +159,10 @@ async function digest(msg) {
 async function initLoad() {
   if (repoUrl.length === 0) {
     report = await loadReport();
-    reportErrors = await loadError();
+    reportError = await loadError();
   }
   reportHash = await digest(JSON.stringify(report));
-  reportErrorsHash = await digest(JSON.stringify(reportErrors));
+  reportErrorHash = await digest(JSON.stringify(reportError));
   reload(report);
 
   if (enableSync) {
@@ -191,12 +193,12 @@ if (repoUrl.length === 0) {
     }
 
     const errorObj = await loadError();
-    const newReportErrorsHash = await digest(JSON.stringify(errorObj));
-    if (newReportErrorsHash !== reportErrorsHash) {
-      reportErrors = errorObj;
-      reportErrorsHash = newReportErrorsHash;
+    const newReportErrorHash = await digest(JSON.stringify(errorObj));
+    if (newReportErrorHash !== reportErrorHash) {
+      reportError = errorObj;
+      reportErrorHash = newReportErrorHash;
       document.querySelector('#service-graph')
-        .setAttribute('errors', JSON.stringify(reportErrors));
+        .setAttribute('errors', JSON.stringify(reportError.errors));
     }
 
     if (enableSync) {
