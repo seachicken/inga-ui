@@ -11,6 +11,7 @@ export default defineConfig({
     colors: {
       black: colors.black,
       blue: colors.blue,
+      red: colors.red,
       green: tokens.global.green.value,
       gray: colors.trueGray,
       white: colors.white,

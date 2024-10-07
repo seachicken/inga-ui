@@ -107,12 +107,22 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       <template id="service-template">
         <div class="service absolute rounded z-30 m-3 p-2 hover:ring-2 cursor-move select-none">
           <span class="name relative bg-gray-100 rounded-lg px-2 py-1 text-lg"></span>
+          <div class="errors"></div>
           <div class="flex">
             <div class="in">
             </div>
             <div class="out">
             </div>
           </div>
+        </div>
+      </template>
+
+      <template id="error-template">
+        <div class="error flex items-center rounded bg-red-100 text-red-700 mt-2 mx-2 px-4 py-2">
+          <div class="fill-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042L6.94 8 4.97 9.97a.749.749 0 0 0 .326 1.275.749.749 0 0 0 .734-.215L8 9.06l1.97 1.97a.749.749 0 0 0 1.275-.326.749.749 0 0 0-.215-.734L9.06 8l1.97-1.97a.749.749 0 0 0-.326-1.275.749.749 0 0 0-.734.215L8 6.94Z"></path></svg>
+          </div>
+          <span class="message ml-2"></span>
         </div>
       </template>
 
@@ -148,9 +158,11 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.nodes = this.shadowRoot.querySelector('#nodes');
     this.edges = this.shadowRoot.querySelector('#edges');
     this.serviceTemplate = this.shadowRoot.querySelector('#service-template');
+    this.errorTemplate = this.shadowRoot.querySelector('#error-template');
     this.fileTemplate = this.shadowRoot.querySelector('#file-template');
     this.declarationTemplate = this.shadowRoot.querySelector('#declaration-template');
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
+    this.errors = [];
     this.filesChangedKeys = [];
     this.searchingKeys = [];
     this.declarations = new Map();
@@ -201,12 +213,16 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   }
 
   static get observedAttributes() {
-    return ['src', 'fileschangedkeys', 'searchingkeys', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
+    return ['src', 'errors', 'fileschangedkeys', 'searchingkeys', 'state', 'enablesync', 'repourl', 'prnumber', 'entrypointselect'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'src') {
       this.graphs = JSON.parse(newValue);
+      this.render();
+    }
+    if (name === 'errors') {
+      this.errors = JSON.parse(newValue);
       this.render();
     }
     if (name === 'fileschangedkeys') {
@@ -330,6 +346,14 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     service.style.left = `${depth * 430}px`;
     service.style.top = `${i * 150}px`;
     service.querySelector('.name').innerHTML = g.service;
+
+    const error = this.errors.find((e) => e.service === g.service);
+    if (error) {
+      const errorRoot = document.importNode(this.errorTemplate.content, true);
+      const errorDom = errorRoot.querySelector('.error');
+      errorDom.querySelector('.message').innerHTML = 'Signature loading failed. Please compile this project.';
+      service.querySelector('.errors').appendChild(errorDom);
+    }
 
     service.addEventListener('mousedown', (e) => {
       const panelRect = this.panel.getBoundingClientRect();
