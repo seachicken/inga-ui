@@ -1,7 +1,7 @@
 {
   "name": "inga-ui",
   "private": true,
-  "version": "0.4.9",
+  "version": "0.7.0",
   "type": "module",
   "scripts": {
     "render": "node render.js",
