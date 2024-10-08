@@ -60,16 +60,16 @@ async function loadState() {
   return response.json();
 }
 
-function filterSearchingKeys(reportObj) {
-  return reportObj.results
-    .flatMap((r) => r)
+function filterSearchingKeys(results) {
+  return results
     .filter((r) => r.type === 'searching')
     .map((r) => graph.getPosKey(r.origin));
 }
 
 function reload(reportObj) {
+  const results = reportObj?.results || [];
   const uniqueKeys = new Set();
-  const flatResults = reportObj.results
+  const flatResults = results
     .flatMap((r) => r)
     .filter((r) => {
       const key = `${graph.getPosKey(r.entrypoint)}_${graph.getPosKey(r.origin)}`;
@@ -79,9 +79,8 @@ function reload(reportObj) {
     });
 
   entrypointTree = sort.getFilePoss(flatResults
-    .flatMap((r) => r)
     .filter((p) => p.type === 'entrypoint'));
-  const graphsByDefinition = reportObj.results.map((r) => graph.create(r));
+  const graphsByDefinition = results.map((r) => graph.create(r));
   const filesChangedKeys = new Set(graphsByDefinition
     .flatMap((g) => graph.findLeafPoss(g).map((p) => graph.getPosKey(p))));
   const graphs = graph.create(flatResults);
@@ -102,7 +101,7 @@ function reload(reportObj) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(report))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(flatResults))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
