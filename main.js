@@ -67,8 +67,9 @@ function filterSearchingKeys(results) {
 }
 
 function reload(reportObj) {
+  const results = reportObj?.results || [];
   const uniqueKeys = new Set();
-  const flatResults = reportObj.results
+  const flatResults = results
     .flatMap((r) => r)
     .filter((r) => {
       const key = `${graph.getPosKey(r.entrypoint)}_${graph.getPosKey(r.origin)}`;
@@ -79,7 +80,7 @@ function reload(reportObj) {
 
   entrypointTree = sort.getFilePoss(flatResults
     .filter((p) => p.type === 'entrypoint'));
-  const graphsByDefinition = reportObj.results.map((r) => graph.create(r));
+  const graphsByDefinition = results.map((r) => graph.create(r));
   const filesChangedKeys = new Set(graphsByDefinition
     .flatMap((g) => graph.findLeafPoss(g).map((p) => graph.getPosKey(p))));
   const graphs = graph.create(flatResults);
