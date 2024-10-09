@@ -95,7 +95,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
       <div id="panel" class="relative w-[5000px] h-[5000px]">
-        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10"></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10 pointer-events-none"></svg>
         <div id="nodes" class="absolute w-full h-full"></div>
         <button id="sync-button" class="flex items-end fixed mt-2 z-50 max-w-max mx-auto right-5 bottom-5 rounded-md border-1">
           <div class="fill-gray-500 m-2">
@@ -105,9 +105,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </div>
 
       <template id="service-template">
-        <div class="service absolute rounded z-30 m-3 p-2 hover:ring-2 cursor-move select-none">
-          <span class="name relative bg-gray-100 rounded-lg px-2 py-1 text-lg"></span>
-          <div class="errors"></div>
+        <div class="service absolute rounded-md hover:ring-2 cursor-move select-none">
+          <div class="absolute rounded-md w-full h-full bg-white/50 backdrop-blur-md"></div>
+          <span class="name relative mx-3 text-lg"></span>
+          <div class="errors relative"></div>
           <div class="flex">
             <div class="in">
             </div>
@@ -118,7 +119,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="error-template">
-        <div class="error flex items-center rounded bg-red-100 text-red-700 mt-2 mx-2 px-4 py-2">
+        <div class="error flex items-center rounded bg-red-100 text-red-700 mt-2 mx-3 px-4 py-2">
           <div class="fill-red-700">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042L6.94 8 4.97 9.97a.749.749 0 0 0 .326 1.275.749.749 0 0 0 .734-.215L8 9.06l1.97 1.97a.749.749 0 0 0 1.275-.326.749.749 0 0 0-.215-.734L9.06 8l1.97-1.97a.749.749 0 0 0-.326-1.275.749.749 0 0 0-.734.215L8 6.94Z"></path></svg>
           </div>
@@ -127,7 +128,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="file-template">
-        <div class="file relative rounded bg-white border-1 drop-shadow m-3 py-1 z-20">
+        <div class="file relative rounded bg-white border-1 drop-shadow m-5 py-1 z-30">
           <div class="flex mb-1 px-2 items-center">
             <p class="name"></p>
           </div>
@@ -343,8 +344,8 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
   renderGraph(g, i, depth = 0) {
     const serviceRoot = document.importNode(this.serviceTemplate.content, true);
     const service = serviceRoot.querySelector('.service');
-    service.style.left = `${depth * 430}px`;
-    service.style.top = `${i * 150}px`;
+    service.style.left = `${depth * 430 + 30}px`;
+    service.style.top = `${i * 150 + 30}px`;
     service.querySelector('.name').innerHTML = g.service;
 
     const error = this.errors.find((e) => e.service === g.service);
