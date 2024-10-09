@@ -107,7 +107,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       <template id="service-template">
         <div class="service absolute rounded-md hover:ring-2 cursor-move select-none">
           <div class="absolute rounded-md w-full h-full bg-white/50 backdrop-blur-md"></div>
-          <span class="name relative mx-3 text-lg"></span>
+          <span class="name relative mx-2 text-gray-500"></span>
           <div class="errors relative"></div>
           <div class="flex">
             <div class="in">
