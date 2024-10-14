@@ -101,7 +101,7 @@ function reload(reportObj) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(flatResults))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors || [])} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(flatResults))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
     </div>
   `;
 
