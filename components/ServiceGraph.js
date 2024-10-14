@@ -352,7 +352,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     if (error) {
       const errorRoot = document.importNode(this.errorTemplate.content, true);
       const errorDom = errorRoot.querySelector('.error');
-      errorDom.querySelector('.message').innerHTML = 'Signature loading failed. Try compile and restart the server.';
+      errorDom.querySelector('.message').innerHTML = 'Signature loading failed. Please recompile this project.';
       service.querySelector('.errors').appendChild(errorDom);
     }
 
