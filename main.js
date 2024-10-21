@@ -157,8 +157,7 @@ async function digest(msg) {
 
 async function initLoad() {
   if (repoUrl.length === 0) {
-    report = await loadReport();
-    reportError = await loadError();
+    [report, reportError] = await Promise.all([loadReport(), loadError()]);
   }
   reportHash = await digest(JSON.stringify(report));
   reportErrorHash = await digest(JSON.stringify(reportError));
@@ -176,7 +175,8 @@ initLoad();
 
 if (repoUrl.length === 0) {
   setInterval(async () => {
-    const reportObj = await loadReport();
+    const [reportObj, errorObj] = await Promise.all([loadReport(), loadError()]);
+
     const newReportHash = await digest(JSON.stringify(reportObj));
     if (newReportHash !== reportHash) {
       report = reportObj;
@@ -191,7 +191,6 @@ if (repoUrl.length === 0) {
       }
     }
 
-    const errorObj = await loadError();
     const newReportErrorHash = await digest(JSON.stringify(errorObj));
     if (newReportErrorHash !== reportErrorHash) {
       reportError = errorObj;
