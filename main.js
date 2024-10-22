@@ -63,7 +63,7 @@ async function loadState() {
 function filterSearchingKeys(results) {
   return results
     .filter((r) => r.type === 'searching')
-    .map((r) => graph.getPosKey(r.origin));
+    .map((r) => graph.getPosKey(r.entrypoint ? r.entrypoint : r.origin));
 }
 
 function reload(reportObj) {

@@ -336,6 +336,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
     for (const key of this.searchingKeys) {
       if (this.declarations.has(key)) {
+        this.declarations.get(key).querySelector('.joint').classList.remove('hidden');
         this.declarations.get(key).querySelector('.joint-searching').classList.remove('hidden');
       }
     }
