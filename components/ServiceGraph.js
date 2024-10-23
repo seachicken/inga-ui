@@ -165,7 +165,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.jointTemplate = this.shadowRoot.querySelector('#joint-template');
     this.errors = [];
     this.filesChangedKeys = [];
-    this.searchingKeys = [];
+    this.searchingKeys = new Set();
     this.declarations = new Map();
     this.selectEntrypoint = '';
     this.selectEntrypointState = selectState.NORMAL;
@@ -231,7 +231,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       this.render();
     }
     if (name === 'searchingkeys') {
-      this.searchingKeys = JSON.parse(newValue);
+      this.searchingKeys = new Set(JSON.parse(newValue));
       this.render();
     }
     if (name === 'state') {
@@ -333,11 +333,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     for (const dec of this.declarations.values()) {
       dec.querySelectorAll('.joint-searching')
         .forEach((j) => j.classList.add('hidden'));
-    }
-    for (const key of this.searchingKeys) {
-      if (this.declarations.has(key)) {
-        this.declarations.get(key).querySelector('.joint-searching').classList.remove('hidden');
-      }
     }
   }
 
@@ -468,8 +463,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
         for (const origin of innerConn.origins) {
           this.renderEdge(
-            declarations.get(graph.getPosKey(innerConn.entrypoint)),
-            declarations.get(graph.getPosKey(origin)),
+            innerConn.entrypoint,
+            origin,
+            declarations,
             this.selectDeclaration
               ? this.selectDeclarations.has(graph.getPosKey(innerConn.entrypoint))
                 && this.selectDeclarations.has(graph.getPosKey(origin))
@@ -485,8 +481,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         let newParentKey = null;
         for (const conn of connection.innerConnections) {
           this.renderEdge(
-            declarations.get(graph.getPosKey(conn.entrypoint)),
-            declarations.get(graph.getPosKey(conn.origin)),
+            conn.entrypoint,
+            conn.origin,
+            declarations,
             this.selectDeclaration
               ? this.selectDeclarations.has(graph.getPosKey(conn.entrypoint))
               : selected,
@@ -506,7 +503,9 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
   }
 
-  renderEdge(dom1, dom2, selected) {
+  renderEdge(pos1, pos2, declarations, selected) {
+    const dom1 = declarations.get(graph.getPosKey(pos1));
+    const dom2 = declarations.get(graph.getPosKey(pos2));
     const edge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     if (dom1 && dom2) {
       const panelRect = this.panel.getBoundingClientRect();
@@ -520,6 +519,14 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     }
     dom1?.querySelectorAll('.joint')[1].classList.remove('hidden');
     dom2?.querySelectorAll('.joint')[0].classList.remove('hidden');
+    if (this.searchingKeys.has(graph.getPosKey(pos1))) {
+      dom1?.querySelectorAll('.joint')[0].classList.remove('hidden');
+      dom1?.querySelectorAll('.joint-searching')[0].classList.remove('hidden');
+    }
+    if (this.searchingKeys.has(graph.getPosKey(pos2))) {
+      dom2?.querySelectorAll('.joint')[0].classList.remove('hidden');
+      dom2?.querySelectorAll('.joint-searching')[0].classList.remove('hidden');
+    }
     if (selected) {
       if (this.selectDeclaration) {
         dom1?.querySelectorAll('.joint-inner').forEach((j) => j.classList.add('joint-select-changed'));
