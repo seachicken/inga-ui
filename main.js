@@ -1,6 +1,7 @@
 import { install } from '@twind/core';
 import config from './twind.config';
 import FileTree from './components/FileTree.js';
+import PopupList from './components/PopupList.js';
 import ServiceGraph from './components/ServiceGraph.js';
 import TreeItem from './components/TreeItem.js';
 import graph from './core/graph.js';
@@ -10,6 +11,7 @@ import { selectState } from './core/state.js';
 install(config);
 
 window.customElements.define('file-tree', FileTree);
+window.customElements.define('popup-list', PopupList);
 window.customElements.define('service-graph', ServiceGraph);
 window.customElements.define('tree-item', TreeItem);
 
@@ -18,6 +20,7 @@ const supportedReportErrorVersion = '0.1';
 const repoUrl = window.inga_repo_url;
 const headSha = window.inga_head_sha;
 const prNumber = window.inga_pr_number;
+const connectionNoCaller = '(no caller)';
 let report = window.inga_report;
 let reportHash = '';
 let reportError = {};
@@ -27,6 +30,42 @@ let stateHash = '';
 let entrypointTree = [];
 let selectedFileIndex = 0;
 let enableSync = false;
+
+const urlParams = new URLSearchParams(window.location.search);
+const wsPort = urlParams.get('wsPort');
+let webSocket;
+let connectionTarget;
+
+function connectWebSocket() {
+  webSocket = new WebSocket(`ws://localhost:${wsPort}`);
+
+  webSocket.addEventListener('message', (json) => {
+    const msg = JSON.parse(json.data);
+    if (msg.method === 'getConnectionPaths') {
+      const items = msg.modulePaths.map((p) => ({
+        name: p,
+        active: msg.callerHint?.map((c) => c.path).includes(p) || false,
+      }));
+      items.unshift({
+        name: connectionNoCaller,
+        active: msg.callerHint ? msg.callerHint.length === 0 : false,
+      });
+      document.querySelector('#connection-selector')?.setAttribute('items', JSON.stringify(items));
+    }
+  });
+
+  webSocket.addEventListener('close', () => {
+    setTimeout(connectWebSocket, 10000);
+  });
+
+  webSocket.addEventListener('error', () => {
+    webSocket.close();
+  });
+}
+
+if (wsPort) {
+  connectWebSocket();
+}
 
 async function loadReport() {
   const response = await fetch('report/report.json', { cache: 'no-cache' });
@@ -102,6 +141,7 @@ function reload(reportObj) {
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
       <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors || [])} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(flatResults))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <popup-list id="connection-selector" class="absolute hidden z-40" title="Add caller hint"></popup-list>
     </div>
   `;
 
@@ -109,6 +149,7 @@ function reload(reportObj) {
   const entrypointTreeView = document.querySelector('#entrypoint-tree');
   const separator = document.querySelector('#separator');
   const serviceGraph = document.querySelector('#service-graph');
+  const connectionSelector = document.querySelector('#connection-selector');
 
   entrypointTreeView.addEventListener('itemselect', (e) => {
     serviceGraph.setAttribute(
@@ -129,6 +170,35 @@ function reload(reportObj) {
       state = {};
       stateHash = '';
     }
+  };
+  serviceGraph.onConnectionPressed = (target, dom) => {
+    connectionTarget = target;
+    webSocket?.send(JSON.stringify({
+      method: 'getConnectionPaths',
+      serverPath: connectionTarget,
+    }));
+    connectionSelector.style.left = `${dom.getBoundingClientRect().left}px`;
+    connectionSelector.style.top = `${dom.getBoundingClientRect().bottom}px`;
+    connectionSelector.classList.remove('hidden');
+  };
+
+  connectionSelector.onClose = (items) => {
+    if (connectionTarget) {
+      let clientPaths = [];
+      if (!items.find((i) => i.name === connectionNoCaller)) {
+        clientPaths = items.map((i) => i.name);
+        if (clientPaths.length === 0) {
+          clientPaths = null;
+        }
+      }
+      webSocket?.send(JSON.stringify({
+        method: 'addConnectionPaths',
+        serverPath: connectionTarget,
+        clientPaths,
+      }));
+      connectionTarget = null;
+    }
+    connectionSelector.classList.add('hidden');
   };
 
   separator.addEventListener('mousedown', () => {

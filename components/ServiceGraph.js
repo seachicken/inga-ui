@@ -107,7 +107,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       <template id="service-template">
         <div class="service absolute rounded-md hover:ring-2 cursor-move select-none">
           <div class="absolute rounded-md w-full h-full bg-white/50 backdrop-blur-md"></div>
-          <span class="name relative mx-2 text-gray-500"></span>
+          <div class="flex items-center">
+            <button id="connection-button" class="relative fill-gray-500 hover:bg-gray-200 hover:rounded-full p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="13" height="13"><path d="M6.122.392a1.75 1.75 0 0 1 1.756 0l5.25 3.045c.54.313.872.89.872 1.514V7.25a.75.75 0 0 1-1.5 0V5.677L7.75 8.432v6.384a1 1 0 0 1-1.502.865L.872 12.563A1.75 1.75 0 0 1 0 11.049V4.951c0-.624.332-1.2.872-1.514ZM7.125 1.69a.248.248 0 0 0-.25 0l-4.63 2.685L7 7.133l4.755-2.758ZM1.5 11.049a.25.25 0 0 0 .125.216l4.625 2.683V8.432L1.5 5.677Zm11.672-.282L11.999 12h3.251a.75.75 0 0 1 0 1.5h-3.251l1.173 1.233a.75.75 0 1 1-1.087 1.034l-2.378-2.5a.75.75 0 0 1 0-1.034l2.378-2.5a.75.75 0 0 1 1.087 1.034Z"></path></svg>
+            </button>
+            <span class="name relative ml-1 mr-2 text-gray-500"></span>
+          </div>
           <div class="errors relative"></div>
           <div class="flex">
             <div class="in">
@@ -172,6 +177,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     this.selectDeclaration = '';
     this.selectDeclarations = new Set();
     this.callbackStateChanged = () => {};
+    this.callbackConnectionPressed = () => {};
 
     const syncButton = this.shadowRoot.querySelector('#sync-button');
     const handleSelectSyncButton = () => {
@@ -211,6 +217,10 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
   set onStateChanged(callback) {
     this.callbackStateChanged = callback;
+  }
+
+  set onConnectionPressed(callback) {
+    this.callbackConnectionPressed = callback;
   }
 
   static get observedAttributes() {
@@ -342,6 +352,12 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     service.style.left = `${depth * 430 + 30}px`;
     service.style.top = `${i * 150 + 30}px`;
     service.querySelector('.name').innerHTML = g.service;
+
+    const connectionButton = service.querySelector('#connection-button');
+    connectionButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.callbackConnectionPressed(g.service, e.currentTarget);
+    });
 
     const error = this.errors.find((e) => e.service === g.service);
     if (error) {
