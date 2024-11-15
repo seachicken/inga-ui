@@ -97,7 +97,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       <div id="panel" class="relative w-[5000px] h-[5000px]">
         <svg xmlns="http://www.w3.org/2000/svg" id="edges" class="absolute w-full h-full z-10 pointer-events-none"></svg>
         <div id="nodes" class="absolute w-full h-full"></div>
-        <button id="sync-button" class="flex items-end fixed mt-2 z-50 max-w-max mx-auto right-2 bottom-2 rounded-md border-1">
+        <button id="sync-button" class="flex items-end fixed mt-2 z-50 max-w-max mx-auto right-2 bottom-2 rounded-md border-1" title="Auto sync">
           <div class="fill-gray-500 m-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path></svg>
           </div>
@@ -108,7 +108,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
         <div class="service absolute rounded-md hover:ring-2 cursor-move select-none">
           <div class="absolute rounded-md w-full h-full bg-white/50 backdrop-blur-md"></div>
           <div class="flex items-center">
-            <button id="connection-button" class="relative fill-gray-500 hover:bg-gray-200 hover:rounded-full p-2">
+            <button id="connection-button" class="relative fill-gray-500 hover:bg-gray-200 hover:rounded-full p-2" title="Add caller hint">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="13" height="13"><path d="M6.122.392a1.75 1.75 0 0 1 1.756 0l5.25 3.045c.54.313.872.89.872 1.514V7.25a.75.75 0 0 1-1.5 0V5.677L7.75 8.432v6.384a1 1 0 0 1-1.502.865L.872 12.563A1.75 1.75 0 0 1 0 11.049V4.951c0-.624.332-1.2.872-1.514ZM7.125 1.69a.248.248 0 0 0-.25 0l-4.63 2.685L7 7.133l4.755-2.758ZM1.5 11.049a.25.25 0 0 0 .125.216l4.625 2.683V8.432L1.5 5.677Zm11.672-.282L11.999 12h3.251a.75.75 0 0 1 0 1.5h-3.251l1.173 1.233a.75.75 0 1 1-1.087 1.034l-2.378-2.5a.75.75 0 0 1 0-1.034l2.378-2.5a.75.75 0 0 1 1.087 1.034Z"></path></svg>
             </button>
             <span class="name relative ml-1 mr-2 text-gray-500"></span>
