@@ -181,6 +181,14 @@ function reload(reportObj) {
     connectionSelector.style.top = `${dom.getBoundingClientRect().bottom}px`;
     connectionSelector.classList.remove('hidden');
   };
+  serviceGraph.onDeclarationPressed = (dec) => {
+    webSocket?.send(JSON.stringify({
+      method: 'openFile',
+      path: dec.path,
+      line: dec.line,
+      offset: dec.offset,
+    }));
+  };
 
   connectionSelector.onClose = (items) => {
     if (connectionTarget) {
