@@ -44,7 +44,7 @@ export default class SettingsPopup extends withTwind(HTMLElement) {
     this.root.classList.add('hidden');
     this.onCloseCallback = () => {};
     this.handleOutsideClick = (e) => {
-      if (!this.root.classList.contains('hidden') && !this.contains(e.target)) {
+      if (!this.root.classList.contains('hidden') && !this.root.contains(e.target)) {
         this.onCloseCallback();
       }
     };
@@ -53,6 +53,7 @@ export default class SettingsPopup extends withTwind(HTMLElement) {
       await navigator.clipboard.writeText(this.shadowRoot.querySelector('#config').value);
     });
 
+    this.root.addEventListener('click', (e) => e.stopPropagation());
     document.addEventListener('click', this.handleOutsideClick);
   }
 
