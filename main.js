@@ -34,6 +34,7 @@ let enableSync = false;
 const urlParams = new URLSearchParams(window.location.search);
 const wsPort = urlParams.get('wsPort');
 let webSocket;
+let callerHints = [];
 let connectionTarget;
 
 function connectWebSocket() {
@@ -41,17 +42,32 @@ function connectWebSocket() {
 
   webSocket.addEventListener('message', (json) => {
     const msg = JSON.parse(json.data);
-    if (msg.method === 'getConnectionPaths') {
-      const items = msg.modulePaths.map((p) => ({
-        name: p,
-        active: msg.callerHint?.map((c) => c.path).includes(p) || false,
-      }));
-      items.unshift({
-        name: connectionNoCaller,
-        active: msg.callerHint ? msg.callerHint.length === 0 : false,
-      });
-      document.querySelector('#connection-selector')?.setAttribute('items', JSON.stringify(items));
+    switch (msg.method) {
+      case 'getConnectionPaths': {
+        const items = msg.modulePaths.map((p) => ({
+          name: p,
+          active: msg.callerHint?.map((c) => c.path).includes(p) || false,
+        }));
+        items.unshift({
+          name: connectionNoCaller,
+          active: msg.callerHint ? msg.callerHint.length === 0 : false,
+        });
+        document.querySelector('#connection-selector')?.setAttribute('items', JSON.stringify(items));
+        break;
+      }
+      case 'getCallerHints':
+        callerHints = msg.callerHints;
+        document.querySelector('#service-graph')
+          .setAttribute('callerhints', JSON.stringify(msg.callerHints));
+        break;
+      default:
     }
+  });
+
+  webSocket.addEventListener('open', () => {
+    webSocket?.send(JSON.stringify({
+      method: 'getCallerHints',
+    }));
   });
 
   webSocket.addEventListener('close', () => {
@@ -61,10 +77,6 @@ function connectWebSocket() {
   webSocket.addEventListener('error', () => {
     webSocket.close();
   });
-}
-
-if (wsPort) {
-  connectWebSocket();
 }
 
 async function loadReport() {
@@ -140,7 +152,7 @@ function reload(reportObj) {
         <file-tree id="entrypoint-tree" src=${JSON.stringify(entrypointTree)} repourl="${repoUrl}" headsha="${headSha}" defaultindex="${selectedFileIndex}"></file-tree>
       </div>
       <div id="separator" class="cursor-col-resize border-1 hover:border-green"></div>
-      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors || [])} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(flatResults))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
+      <service-graph id="service-graph" class="flex-1 overflow-auto bg-gray-100" src=${JSON.stringify(graphs)} errors=${JSON.stringify(reportError.errors || [])} callerhints=${JSON.stringify(callerHints)} fileschangedkeys=${JSON.stringify([...filesChangedKeys])} searchingkeys=${JSON.stringify(filterSearchingKeys(flatResults))} state=${JSON.stringify(state)} enablesync="${enableSync}" repourl="${repoUrl}" prnumber="${prNumber}"></service-graph>
       <popup-list id="connection-selector" class="absolute hidden z-40" title="Add caller hint"></popup-list>
     </div>
   `;
@@ -204,6 +216,9 @@ function reload(reportObj) {
         serverPath: connectionTarget,
         clientPaths,
       }));
+      webSocket?.send(JSON.stringify({
+        method: 'getCallerHints',
+      }));
       connectionTarget = null;
     }
     connectionSelector.classList.add('hidden');
@@ -224,6 +239,10 @@ function reload(reportObj) {
     reload(report);
     document.querySelector('#refresh-button').classList.add('hidden');
   });
+
+  if (wsPort) {
+    connectWebSocket();
+  }
 }
 
 async function digest(msg) {
