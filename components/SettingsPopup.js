@@ -27,7 +27,7 @@ export default class SettingsPopup extends withTwind(HTMLElement) {
     this.shadowRoot.adoptedStyleSheets = [sheet.target];
     this.shadowRoot.innerHTML = `
       <div id="root" class="w-96 p-5 bg-white rounded-xl shadow-md">
-        <p class="text-gray-500 my-1 text-sm">Copy the <span class="font-bold">.inga.yml</span> file to your project root directory to make the settings permanent.</p>
+        <p class="text-gray-500 my-1 text-sm">Copy the <span class="font-bold select-all">.inga.yml</span> file to your project root directory to make the settings permanent.</p>
         <div class="relative">
           <textarea id="config" class="w-full mt-1 p-2 rounded text-gray-500" rows="5" disabled>
           </textarea>
