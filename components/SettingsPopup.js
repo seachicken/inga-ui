@@ -29,7 +29,7 @@ export default class SettingsPopup extends withTwind(HTMLElement) {
       <div id="root" class="w-96 p-5 bg-white rounded-xl shadow-md">
         <p class="text-gray-500 my-1 text-sm">Copy the <span class="font-bold">.inga.yml</span> file to your project root directory to make the settings permanent.</p>
         <div class="relative">
-          <textarea id="config" class="w-full p-2 rounded text-gray-500" rows="5" disabled>
+          <textarea id="config" class="w-full mt-1 p-2 rounded text-gray-500" rows="5" disabled>
           </textarea>
           <button id="copy-button" class="absolute top-2 right-2 hover:bg-gray-100 rounded-md border-1" title="Copy to clipboard">
             <div class="fill-gray-500 m-2">
