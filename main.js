@@ -94,15 +94,16 @@ async function loadReport() {
 }
 
 async function loadError() {
-  const response = await fetch('report/error.json', { cache: 'no-cache' });
-  if (!response.ok) {
-    return [];
-  }
-  const obj = await response.json();
-  if (obj.version !== supportedReportErrorVersion) {
-    return [];
-  }
-  return obj;
+  //const response = await fetch('report/error.json', { cache: 'no-cache' });
+  //if (!response.ok) {
+  //  return [];
+  //}
+  //const obj = await response.json();
+  //if (obj.version !== supportedReportErrorVersion) {
+  //  return [];
+  //}
+  //return obj;
+  return [];
 }
 
 async function loadState() {
