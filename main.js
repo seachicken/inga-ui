@@ -309,5 +309,5 @@ if (repoUrl.length === 0) {
           .setAttribute('state', JSON.stringify(state));
       }
     }
-  }, 1000);
+  }, 5000);
 }
