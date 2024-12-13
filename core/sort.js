@@ -149,7 +149,9 @@ function groupByKey(poss, key) {
     if (foundDeclarations.length > 0) {
       const foundDeclaration = foundDeclarations.find((d) => equalsDeclaration(d, target));
       if (foundDeclaration) {
-        foundDeclaration.origins.push(pos.origin);
+        if (pos.origin) {
+          foundDeclaration.origins.push(pos.origin);
+        }
       } else {
         foundDeclarations.push(
           {
