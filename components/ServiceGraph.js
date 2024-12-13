@@ -432,7 +432,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     const filePossIn = sort.getFilePoss(
       g.innerConnections
-        .filter((c) => !isOut(c.entrypoint, g.innerConnections))
         .map((c) => ({ entrypoint: c.entrypoint })),
     ).filter((p) => p.type === fileType.FILE);
     for (const filePosIn of filePossIn) {
@@ -442,7 +441,6 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
     const filePossOut = sort.getFilePoss(
       g.innerConnections
         .flatMap((c) => c.origins)
-        .filter((p) => isOut(p, g.innerConnections))
         .map((p) => ({ origin: p })),
       groupKey.ORIGIN,
     ).filter((p) => p.type === fileType.FILE);
