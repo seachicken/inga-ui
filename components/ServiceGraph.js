@@ -432,7 +432,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
 
     const selfOrigins = [];
     for (const conn of g.innerConnections) {
-      for (const origin of conn.origins.filter((o) => o.path === conn.entrypoint.path)) {
+      for (const origin of conn.origins.filter((o) => o.path === conn.entrypoint?.path)) {
         selfOrigins.push({ entrypoint: origin });
       }
     }
