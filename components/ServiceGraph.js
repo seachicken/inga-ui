@@ -148,7 +148,7 @@ export default class ServiceGraph extends withTwind(HTMLElement) {
       </template>
 
       <template id="file-template">
-        <div class="file relative rounded bg-white border-1 drop-shadow m-5 py-1 z-30">
+        <div class="file relative rounded bg-white border-1 drop-shadow-xl m-5 py-1 z-30">
           <div class="flex mb-1 px-2 items-center">
             <p class="name"></p>
           </div>
