@@ -82,6 +82,7 @@ export default class PopupList extends withTwind(HTMLElement) {
       this.items = JSON.parse(newValue);
 
       this.popupList.innerHTML = '';
+      const fragment = document.createDocumentFragment();
       for (const item of this.items) {
         const itemRoot = document.importNode(this.popupItemTemplate.content, true);
         const itemDom = itemRoot.querySelector('.popup-item');
@@ -92,8 +93,9 @@ export default class PopupList extends withTwind(HTMLElement) {
           target.active = !target.active;
           this.applyActiveStyle(target.active, itemDom);
         });
-        this.popupList.appendChild(itemDom);
+        fragment.appendChild(itemDom);
       }
+      this.popupList.appendChild(fragment);
     }
   }
 
