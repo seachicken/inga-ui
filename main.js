@@ -19,11 +19,12 @@ window.customElements.define('tree-item', TreeItem);
 
 const supportedReportVersion = '0.2';
 const supportedReportErrorVersion = '0.1';
-const repoUrl = window.inga_repo_url;
-const headSha = window.inga_head_sha;
-const prNumber = window.inga_pr_number;
 const connectionNoCaller = '(no caller)';
 let report = window.inga_report;
+let reportUrl = 'report/report.json';
+let repoUrl = window.inga_repo_url;
+let headSha = window.inga_head_sha;
+let prNumber = window.inga_pr_number;
 let reportHash = '';
 let reportError = {};
 let reportErrorHash = '';
@@ -33,6 +34,19 @@ let entrypointTree = [];
 let selectedFileIndex = 0;
 let enableSync = false;
 
+const hashParams = new URLSearchParams(window.location.hash.slice(1));
+if (hashParams.has('reportUrl')) {
+  reportUrl = hashParams.get('reportUrl');
+}
+if (hashParams.has('repoUrl')) {
+  repoUrl = hashParams.get('repoUrl');
+}
+if (hashParams.has('headSha')) {
+  headSha = hashParams.get('headSha');
+}
+if (hashParams.has('prNumber')) {
+  prNumber = hashParams.get('prNumber');
+}
 const urlParams = new URLSearchParams(window.location.search);
 const wsPort = urlParams.get('wsPort');
 let webSocket;
@@ -82,7 +96,7 @@ function connectWebSocket() {
 }
 
 async function loadReport() {
-  const response = await fetch('report/report.json', { cache: 'no-cache' });
+  const response = await fetch(reportUrl, { cache: 'no-cache' });
   if (!response.ok) {
     return {};
   }
