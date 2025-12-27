@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "render": "node render.js",
-    "dev-embed": "npm run render && vite",
+    "dev": "npm run render && vite",
     "test": "node --test",
-    "build-embed": "npm run render && vite build",
+    "build": "npm run render && vite build",
     "preview": "vite preview",
     "print-pr": "node pr-report.js"
   },
