@@ -22,6 +22,7 @@ const supportedReportErrorVersion = '0.1';
 const connectionNoCaller = '(no caller)';
 let report = window.inga_report;
 let reportUrl = 'report/report.json';
+let hasLocalReport = true;
 let repoUrl = window.inga_repo_url;
 let headSha = window.inga_head_sha;
 let prNumber = window.inga_pr_number;
@@ -37,6 +38,7 @@ let enableSync = false;
 const hashParams = new URLSearchParams(window.location.hash.slice(1));
 if (hashParams.has('reportUrl')) {
   reportUrl = hashParams.get('reportUrl');
+  hasLocalReport = false;
 }
 if (hashParams.has('repoUrl')) {
   repoUrl = hashParams.get('repoUrl');
@@ -287,7 +289,7 @@ async function initLoad() {
 
 initLoad();
 
-if (repoUrl.length === 0) {
+if (repoUrl.length === 0 && hasLocalReport) {
   setInterval(async () => {
     const [reportObj, errorObj] = await Promise.all([loadReport(), loadError()]);
 
